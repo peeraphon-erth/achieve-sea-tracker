@@ -3,7 +3,7 @@
 // 7-phase timeline with task completion checkboxes and reassignment
 
 import { CheckSquare2, Square } from "lucide-react";
-import { useTracker } from "@/contexts/TrackerContext";
+import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, TEAM_MEMBERS } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { MemberPill, TeamMemberSelect } from "./TrackerUI";

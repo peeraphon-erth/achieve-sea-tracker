@@ -3,7 +3,7 @@
 // Team member cards with assigned sections, workload, and quick reassignment
 
 import { useMemo } from "react";
-import { useTracker } from "@/contexts/TrackerContext";
+import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, STATUS_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data";
 import { MemberPill, ProgressBar, ProgressRing, StatusBadge } from "./TrackerUI";
 

@@ -4,7 +4,7 @@
 
 import { FileCheck, FileWarning, FileX, HelpCircle } from "lucide-react";
 import { useMemo } from "react";
-import { useTracker } from "@/contexts/TrackerContext";
+import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { DOC_STATUS_CONFIG, TEAM_MEMBERS, type DocStatus } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { DocStatusBadge, MemberPill, TeamMemberSelect } from "./TrackerUI";

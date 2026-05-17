@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { TrackerProvider, useTracker } from "@/contexts/TrackerContext";
+import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import DocumentsTab from "@/components/DocumentsTab";
@@ -47,7 +47,7 @@ function useDeadlineCountdown() {
 function DashboardInner() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { sections, documents, phases, resetAll } = useTracker();
+  const { sections, documents, phases, resetAll, isOnline, isSyncing } = useTracker();
   const daysLeft = useDeadlineCountdown();
 
   const blockedCount = sections.filter((s) => s.status === "blocked").length;
@@ -210,6 +210,24 @@ function DashboardInner() {
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0 ml-4">
+            {!isOnline && (
+              <div className="flex items-center gap-1.5 bg-yellow-500/20 text-yellow-200 px-2.5 py-1 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                <span className="text-xs font-bold">Offline</span>
+              </div>
+            )}
+            {isOnline && isSyncing && (
+              <div className="flex items-center gap-1.5 bg-blue-500/20 text-blue-200 px-2.5 py-1 rounded-full">
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <span className="text-xs font-bold">Syncing…</span>
+              </div>
+            )}
+            {isOnline && !isSyncing && (
+              <div className="hidden sm:flex items-center gap-1.5 text-green-600/60 px-2.5 py-1 rounded-full text-xs">
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span>Live</span>
+              </div>
+            )}
             {daysLeft <= 30 && daysLeft > 7 && (
               <div className="hidden sm:flex items-center gap-1.5 bg-yellow-500/20 text-yellow-200 px-2.5 py-1 rounded-full">
                 <AlertTriangle className="w-3.5 h-3.5" />
@@ -266,9 +284,5 @@ function DashboardInner() {
 }
 
 export default function Home() {
-  return (
-    <TrackerProvider>
-      <DashboardInner />
-    </TrackerProvider>
-  );
+  return <DashboardInner />;
 }

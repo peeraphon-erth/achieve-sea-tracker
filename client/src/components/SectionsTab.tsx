@@ -4,7 +4,7 @@
 
 import { ChevronDown, ChevronRight, MessageSquare } from "lucide-react";
 import { Fragment, useState } from "react";
-import { useTracker } from "@/contexts/TrackerContext";
+import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, STATUS_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import {
