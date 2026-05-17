@@ -47,7 +47,7 @@ function useDeadlineCountdown() {
 function DashboardInner() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { sections, documents, phases, resetAll, isOnline, isSyncing } = useTracker();
+  const { sections, documents, phases, resetAll, isOnline, isSyncing, supabaseConfigured } = useTracker();
   const daysLeft = useDeadlineCountdown();
 
   const blockedCount = sections.filter((s) => s.status === "blocked").length;
@@ -223,9 +223,15 @@ function DashboardInner() {
               </div>
             )}
             {isOnline && !isSyncing && (
-              <div className="hidden sm:flex items-center gap-1.5 text-green-600/60 px-2.5 py-1 rounded-full text-xs">
-                <span className="w-2 h-2 rounded-full bg-green-500" />
-                <span>Live</span>
+              <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs ${
+                supabaseConfigured
+                  ? "text-green-600/60"
+                  : "text-orange-600/60 bg-orange-500/10"
+              }`}>
+                <span className={`w-2 h-2 rounded-full ${
+                  supabaseConfigured ? "bg-green-500" : "bg-orange-500"
+                }`} />
+                <span>{supabaseConfigured ? "Live (Supabase)" : "Local Only"}</span>
               </div>
             )}
             {daysLeft <= 30 && daysLeft > 7 && (

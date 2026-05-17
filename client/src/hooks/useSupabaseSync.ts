@@ -1,7 +1,7 @@
 // Supabase Real-time Sync Hook
 // Syncs tracker state across all connected users via Supabase
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { Document, Phase, Section } from "@/lib/data";
 
@@ -27,13 +27,42 @@ export function useSupabaseSync(
   enabled: boolean = true
 ) {
   const subscriptionsRef = useRef<Array<() => void>>([]);
+  const onUpdateRef = useRef(onUpdate);
+
+  // Keep onUpdate ref in sync
+  useEffect(() => {
+    onUpdateRef.current = onUpdate;
+  }, [onUpdate]);
 
   useEffect(() => {
     if (!supabase || !enabled) return;
 
+    let isMounted = true;
+
     // Clean up previous subscriptions
     subscriptionsRef.current.forEach((unsub) => unsub());
     subscriptionsRef.current = [];
+
+    const fetchAllData = async () => {
+      try {
+        const [sectionsRes, docsRes, phasesRes] = await Promise.all([
+          supabase.from("sections").select("*"),
+          supabase.from("documents").select("*"),
+          supabase.from("phases").select("*"),
+        ]);
+
+        if (isMounted && sectionsRes.data && docsRes.data && phasesRes.data) {
+          onUpdateRef.current({
+            sections: sectionsRes.data as Section[],
+            documents: docsRes.data as Document[],
+            phases: phasesRes.data as Phase[],
+            lastUpdated: Date.now(),
+          });
+        }
+      } catch (err) {
+        console.error("Supabase fetch error:", err);
+      }
+    };
 
     const setupSubscriptions = async () => {
       try {
@@ -73,41 +102,21 @@ export function useSupabaseSync(
           () => supabase.removeChannel(phasesChannel),
         ];
 
-        // Initial fetch
+        // Initial fetch - CRITICAL: This loads data from Supabase on mount
         await fetchAllData();
       } catch (err) {
         console.error("Supabase subscription error:", err);
       }
     };
 
-    const fetchAllData = async () => {
-      try {
-        const [sectionsRes, docsRes, phasesRes] = await Promise.all([
-          supabase.from("sections").select("*"),
-          supabase.from("documents").select("*"),
-          supabase.from("phases").select("*"),
-        ]);
-
-        if (sectionsRes.data && docsRes.data && phasesRes.data) {
-          onUpdate({
-            sections: sectionsRes.data as Section[],
-            documents: docsRes.data as Document[],
-            phases: phasesRes.data as Phase[],
-            lastUpdated: Date.now(),
-          });
-        }
-      } catch (err) {
-        console.error("Supabase fetch error:", err);
-      }
-    };
-
     setupSubscriptions();
 
     return () => {
+      isMounted = false;
       subscriptionsRef.current.forEach((unsub) => unsub());
       subscriptionsRef.current = [];
     };
-  }, [onUpdate, enabled]);
+  }, [enabled]);
 }
 
 export async function updateSectionInSupabase(

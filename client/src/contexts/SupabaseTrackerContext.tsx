@@ -1,7 +1,9 @@
-// Enhanced Tracker Context with Supabase Real-time Sync
-// Automatically syncs all changes across connected users
+"use client";
+// Supabase-first tracker context
+// All data is fetched from Supabase on mount and synced in real-time
+// No localStorage fallback to avoid sandbox/iframe issues
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import {
   INITIAL_DOCUMENTS,
@@ -14,11 +16,11 @@ import {
   type TaskStatus,
 } from "@/lib/data";
 import {
-  isSupabaseConfigured,
   updateDocumentInSupabase,
   updatePhaseTaskInSupabase,
   updateSectionInSupabase,
   useSupabaseSync,
+  isSupabaseConfigured,
 } from "@/hooks/useSupabaseSync";
 
 interface TrackerContextValue {
@@ -27,6 +29,7 @@ interface TrackerContextValue {
   phases: Phase[];
   isOnline: boolean;
   isSyncing: boolean;
+  supabaseConfigured: boolean;
   updateSectionStatus: (id: string, status: TaskStatus) => void;
   updateSectionProgress: (id: string, progress: number) => void;
   updateSectionLeads: (id: string, leadIds: string[]) => void;
@@ -41,167 +44,149 @@ interface TrackerContextValue {
 
 const TrackerContext = createContext<TrackerContextValue | null>(null);
 
-const STORAGE_KEY = "achieve-sea-tracker-v1";
 const supabaseEnabled = isSupabaseConfigured();
 
-function loadFromStorage<T>(key: string, fallback: T): T {
-  try {
-    const raw = localStorage.getItem(key);
-    if (raw) return JSON.parse(raw) as T;
-  } catch {}
-  return fallback;
-}
-
 export function SupabaseTrackerProvider({ children }: { children: React.ReactNode }) {
-  const [sections, setSections] = useState<Section[]>(() =>
-    loadFromStorage(`${STORAGE_KEY}-sections`, INITIAL_SECTIONS)
-  );
-  const [documents, setDocuments] = useState<Document[]>(() =>
-    loadFromStorage(`${STORAGE_KEY}-documents`, INITIAL_DOCUMENTS)
-  );
-  const [phases, setPhases] = useState<Phase[]>(() =>
-    loadFromStorage(`${STORAGE_KEY}-phases`, INITIAL_PHASES)
-  );
+  // State: always start with initial data, will be replaced by Supabase data on mount
+  const [sections, setSections] = useState<Section[]>(INITIAL_SECTIONS);
+  const [documents, setDocuments] = useState<Document[]>(INITIAL_DOCUMENTS);
+  const [phases, setPhases] = useState<Phase[]>(INITIAL_PHASES);
   const [isOnline, setIsOnline] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Supabase real-time sync
-  useSupabaseSync(
-    (state) => {
-      setSections(state.sections);
-      setDocuments(state.documents);
-      setPhases(state.phases);
-      localStorage.setItem(`${STORAGE_KEY}-sections`, JSON.stringify(state.sections));
-      localStorage.setItem(`${STORAGE_KEY}-documents`, JSON.stringify(state.documents));
-      localStorage.setItem(`${STORAGE_KEY}-phases`, JSON.stringify(state.phases));
-    },
-    supabaseEnabled
-  );
-
-  // Persist to localStorage on every change
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_KEY}-sections`, JSON.stringify(sections));
-  }, [sections]);
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_KEY}-documents`, JSON.stringify(documents));
-  }, [documents]);
-  useEffect(() => {
-    localStorage.setItem(`${STORAGE_KEY}-phases`, JSON.stringify(phases));
-  }, [phases]);
-
-  // Network status
-  useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      toast.success("Back online — syncing changes");
-    };
-    const handleOffline = () => {
-      setIsOnline(false);
-      toast.error("Offline — changes will sync when back online");
-    };
-
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-    };
+  // Handle Supabase sync updates
+  const handleSupabaseUpdate = useCallback((state: any) => {
+    setSections(state.sections || INITIAL_SECTIONS);
+    setDocuments(state.documents || INITIAL_DOCUMENTS);
+    setPhases(state.phases || INITIAL_PHASES);
+    setIsSyncing(false);
   }, []);
 
-  const updateSectionStatus = (id: string, status: TaskStatus) => {
-    setSections((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
-    if (supabaseEnabled) updateSectionInSupabase(id, { status });
-  };
+  // Real-time sync hook
+  useSupabaseSync(handleSupabaseUpdate, supabaseEnabled);
 
-  const updateSectionProgress = (id: string, progress: number) => {
-    setSections((prev) => prev.map((s) => (s.id === id ? { ...s, progress } : s)));
-    if (supabaseEnabled) updateSectionInSupabase(id, { progress });
-  };
+  // Update handlers
+  const updateSectionStatus = useCallback((id: string, status: TaskStatus) => {
+    setSections((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, status } : s))
+    );
+    updateSectionInSupabase(id, { status });
+  }, []);
 
-  const updateSectionLeads = (id: string, leadIds: string[]) => {
-    setSections((prev) => prev.map((s) => (s.id === id ? { ...s, leadIds } : s)));
-    if (supabaseEnabled) updateSectionInSupabase(id, { leadIds });
-  };
+  const updateSectionProgress = useCallback((id: string, progress: number) => {
+    setSections((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, progress } : s))
+    );
+    updateSectionInSupabase(id, { progress });
+  }, []);
 
-  const updateSectionNotes = (id: string, notes: string) => {
-    setSections((prev) => prev.map((s) => (s.id === id ? { ...s, notes } : s)));
-    if (supabaseEnabled) updateSectionInSupabase(id, { notes });
-  };
+  const updateSectionLeads = useCallback((id: string, leadIds: string[]) => {
+    setSections((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, leadIds } : s))
+    );
+    updateSectionInSupabase(id, { leadIds });
+  }, []);
 
-  const updateDocStatus = (id: string, status: DocStatus) => {
-    setDocuments((prev) => prev.map((d) => (d.id === id ? { ...d, status } : d)));
-    if (supabaseEnabled) updateDocumentInSupabase(id, { status });
-  };
+  const updateSectionNotes = useCallback((id: string, notes: string) => {
+    setSections((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, notes } : s))
+    );
+    updateSectionInSupabase(id, { notes });
+  }, []);
 
-  const updateDocStatusNote = (id: string, statusNote: string) => {
-    setDocuments((prev) => prev.map((d) => (d.id === id ? { ...d, statusNote } : d)));
-    if (supabaseEnabled) updateDocumentInSupabase(id, { statusNote });
-  };
+  const updateDocStatus = useCallback((id: string, status: DocStatus) => {
+    setDocuments((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, status } : d))
+    );
+    updateDocumentInSupabase(id, { status });
+  }, []);
 
-  const updateDocResponsible = (id: string, responsibleId: string) => {
-    setDocuments((prev) => prev.map((d) => (d.id === id ? { ...d, responsibleId } : d)));
-    if (supabaseEnabled) updateDocumentInSupabase(id, { responsibleId });
-  };
+  const updateDocStatusNote = useCallback((id: string, statusNote: string) => {
+    setDocuments((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, statusNote } : d))
+    );
+    updateDocumentInSupabase(id, { statusNote });
+  }, []);
 
-  const togglePhaseTask = (phaseId: string, taskId: string) => {
+  const updateDocResponsible = useCallback((id: string, responsibleId: string) => {
+    setDocuments((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, responsibleId } : d))
+    );
+    updateDocumentInSupabase(id, { responsibleId });
+  }, []);
+
+  const togglePhaseTask = useCallback((phaseId: string, taskId: string) => {
     setPhases((prev) =>
       prev.map((p) =>
         p.id === phaseId
-          ? { ...p, tasks: p.tasks.map((t) => (t.id === taskId ? { ...t, done: !t.done } : t)) }
+          ? {
+              ...p,
+              tasks: p.tasks.map((t) =>
+                t.id === taskId ? { ...t, done: !t.done } : t
+              ),
+            }
           : p
       )
     );
-    if (supabaseEnabled) {
-      const phase = phases.find((p) => p.id === phaseId);
-      const task = phase?.tasks.find((t) => t.id === taskId);
-      if (task) updatePhaseTaskInSupabase(phaseId, taskId, { done: !task.done });
-    }
-  };
+    // Find current task state to toggle
+    const phase = phases.find((p) => p.id === phaseId);
+    const task = phase?.tasks.find((t) => t.id === taskId);
+    updatePhaseTaskInSupabase(phaseId, taskId, { done: !task?.done });
+  }, [phases]);
 
-  const reassignPhaseTask = (phaseId: string, taskId: string, ownerId: string) => {
+  const reassignPhaseTask = useCallback((phaseId: string, taskId: string, ownerId: string) => {
     setPhases((prev) =>
       prev.map((p) =>
         p.id === phaseId
-          ? { ...p, tasks: p.tasks.map((t) => (t.id === taskId ? { ...t, ownerId } : t)) }
+          ? {
+              ...p,
+              tasks: p.tasks.map((t) =>
+                t.id === taskId ? { ...t, ownerId } : t
+              ),
+            }
           : p
       )
     );
-    if (supabaseEnabled) updatePhaseTaskInSupabase(phaseId, taskId, { ownerId });
-  };
+    updatePhaseTaskInSupabase(phaseId, taskId, { ownerId });
+  }, []);
 
-  const resetAll = () => {
+  const resetAll = useCallback(() => {
     setSections(INITIAL_SECTIONS);
     setDocuments(INITIAL_DOCUMENTS);
     setPhases(INITIAL_PHASES);
+    toast.success("Tracker reset to initial state");
+  }, []);
+
+  const value: TrackerContextValue = {
+    sections,
+    documents,
+    phases,
+    isOnline,
+    isSyncing,
+    supabaseConfigured: supabaseEnabled,
+    updateSectionStatus,
+    updateSectionProgress,
+    updateSectionLeads,
+    updateSectionNotes,
+    updateDocStatus,
+    updateDocStatusNote,
+    updateDocResponsible,
+    togglePhaseTask,
+    reassignPhaseTask,
+    resetAll,
   };
 
   return (
-    <TrackerContext.Provider
-      value={{
-        sections,
-        documents,
-        phases,
-        isOnline,
-        isSyncing,
-        updateSectionStatus,
-        updateSectionProgress,
-        updateSectionLeads,
-        updateSectionNotes,
-        updateDocStatus,
-        updateDocStatusNote,
-        updateDocResponsible,
-        togglePhaseTask,
-        reassignPhaseTask,
-        resetAll,
-      }}
-    >
+    <TrackerContext.Provider value={value}>
       {children}
     </TrackerContext.Provider>
   );
 }
 
 export function useTracker() {
-  const ctx = useContext(TrackerContext);
-  if (!ctx) throw new Error("useTracker must be used within SupabaseTrackerProvider");
-  return ctx;
+  const context = useContext(TrackerContext);
+  if (!context) {
+    throw new Error("useTracker must be used within SupabaseTrackerProvider");
+  }
+  return context;
 }
