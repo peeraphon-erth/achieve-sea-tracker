@@ -1,0 +1,35 @@
+{
+  "build_command": "pnpm run build",
+  "capabilities": [],
+  "dev_command": "pnpm run dev",
+  "env_vars": {},
+  "experiments": null,
+  "git_remote": {
+    "repo_url": "s3://vida-prod-gitrepo/webdev-git/310519663667786656/iZTnwY5zS5xqWARPg8jPpy",
+    "access_key_id": "ASIAZV3A2ECZHTHA2BMO",
+    "secret_access_key": "vfuubDJSsVqTinZpYN5mxl/vUfwA1KhV/pRuXVnd",
+    "session_token": "IQoJb3JpZ2luX2VjENX//////////wEaCXVzLWVhc3QtMSJGMEQCIGemdHBVwMfGo6Ob6f0znlV6cTTMMTb8sSlwjcR/vK4DAiAbVaMyNY1izjNpiOTBRDcohccovOGjc6M6LKyOQPsVqyr/Awie//////////8BEAQaDDY2NTM4NjA5ODg2NiIMscbz2DSIPRHfqNLvKtMDVT0OuDVJnM4EEs7ERsW7xb6+6Ae7IvGfelvq58XRZM33q7rI3RhCOawppaNcT6eo5DqfYvFmlEL3+PsjLRyIHRNb7Auz4e1E2/Y/eNNpJWUiMw+W2z6J4+Vtx1FaDovoVCcPXBtuqr4GxppJccNqCynhRquibrUZDJEGbVYEG6/f2kH0l/V603TnbanVc8T7SVNJVSjP36c4B3VxP0KJN898cNZjJB0kV2d6jta4Jh57568ge0BpoKjLDQPW2KpWpxIwanvDyV1ZSb9s8MnlzQDRgF02cpXxGnIBsL64V485hYObRYelH4MG65cIWfTeoxjldZF6UJl1AdCoEWtwgvO3RNQcAQy2uzPsgBVRgV6prsikOBCmycm0weQrpgwl6MQAzN+FkOIMYB7VdSBjcG1r/CcSfBGxg1JF6sb7OTOILdelX2X+PFrjTSodHaJ48KBI6hjF5zdbjuK8jUbJfuXnnIt3tj3nvq7n98ePSuOIGAQbI8gGIpZQs6ErTWWkgV5HRCrwN01Bk5rNTjY+Ha59iEs4A0NOSUo/K235KRmZV4CHIzYRKYotYyKyiMlSLa6lXzdw0IHDGdSlU+EJIxIEsevmQg96SOez3/5mZpKkyrgw1pCl0AY6ngGq0BrvBh4o5LzR9bcivSraDl4omZgwfeYGT++I2EuFs7qcDvYXfrmKKOMpiSH6Qeco0Rc+EcsHz2aanpyFKEJZ9Aklo52p20gQy5Rti7z6mYf//I8427FpmV0IklI03sNUHOoSIwr6bzMptIiQdmqcNhOV9CF8CZMbLyGpRmaPsOAhA5/tB6kY4oI0+ZBe1833O3iKcYjcfN6w0HqqZw==",
+    "expiration": "2026-05-17T16:47:18.000Z"
+  },
+  "name": "achieve-sea-tracker",
+  "path": "/home/ubuntu/achieve-sea-tracker",
+  "port": 3000,
+  "secrets": {
+    "BUILT_IN_FORGE_API_KEY": "SCuTrgSvP64aSvQXS2wAvx",
+    "BUILT_IN_FORGE_API_URL": "https://forge.manus.ai",
+    "JWT_SECRET": "VK5gC2fYF2hi8P25byFQ8w",
+    "OAUTH_SERVER_URL": "https://api.manus.im",
+    "OWNER_NAME": "Peeraphon Intuphuti",
+    "OWNER_OPEN_ID": "Qtyd3jobg9kCaBHH2SiMMJ",
+    "VITE_ANALYTICS_ENDPOINT": "https://manus-analytics.com",
+    "VITE_ANALYTICS_WEBSITE_ID": "9fa8e740-cc95-4005-a7da-0ffec7a21261",
+    "VITE_APP_ID": "iZTnwY5zS5xqWARPg8jPpy",
+    "VITE_APP_LOGO": "",
+    "VITE_APP_TITLE": "ACHIEVE-SEA Grant Submission Tracker",
+    "VITE_FRONTEND_FORGE_API_KEY": "WunWQKaXsRcEcWaMSNZfLV",
+    "VITE_FRONTEND_FORGE_API_URL": "https://forge.manus.ai",
+    "VITE_OAUTH_PORTAL_URL": "https://manus.im"
+  },
+  "template_id": "web-static",
+  "test_command": "pnpm test"
+}
