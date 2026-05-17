@@ -3,7 +3,7 @@
 // Inline status editing, progress update, task reassignment
 
 import { ChevronDown, ChevronRight, MessageSquare } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment, useState, useMemo } from "react";
 import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, STATUS_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data";
 import { cn } from "@/lib/utils";
@@ -21,14 +21,23 @@ export default function SectionsTab() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>("all");
 
-  const filtered = filter === "all" ? sections : (sections || []).filter((s) => {
-    if (["blocked", "in_progress", "review", "complete", "not_started"].includes(filter)) {
-      return s.status === filter;
-    }
-    // filter by org
-    const memberIds = TEAM_MEMBERS.filter((m) => m.org === filter as OrgId).map((m) => m.id);
-    return s.leadIds.some((id) => memberIds.includes(id));
-  });
+  const filtered = useMemo(() => {
+    let result = filter === "all" ? sections : (sections || []).filter((s) => {
+      if (["blocked", "in_progress", "review", "complete", "not_started"].includes(filter)) {
+        return s.status === filter;
+      }
+      // filter by org
+      const memberIds = TEAM_MEMBERS.filter((m) => m.org === filter as OrgId).map((m) => m.id);
+      return s.leadIds.some((id) => memberIds.includes(id));
+    });
+    
+    // Sort by section number (S1, S2, ... S19) to maintain consistent order
+    return result.sort((a, b) => {
+      const numA = parseInt(a.num.replace(/\D/g, '')) || 0;
+      const numB = parseInt(b.num.replace(/\D/g, '')) || 0;
+      return numA - numB;
+    });
+  }, [sections, filter]);
 
   return (
     <div className="space-y-4 fade-up">
