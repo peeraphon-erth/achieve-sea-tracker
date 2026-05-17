@@ -6,6 +6,7 @@ import { ChevronDown, ChevronRight, MessageSquare } from "lucide-react";
 import { Fragment, useState, useMemo } from "react";
 import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, STATUS_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data";
+import { SECTION_INSTRUCTIONS } from "@/lib/section-instructions";
 import { cn } from "@/lib/utils";
 import {
   MemberPill,
@@ -168,8 +169,10 @@ export default function SectionsTab() {
                           {/* Left: Details */}
                           <div className="space-y-3">
                             <div>
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Role / Instructions</p>
-                              <p className="text-xs text-foreground leading-relaxed bg-muted/50 rounded px-3 py-2">{s.roleNote}</p>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Section Instructions</p>
+                              <p className="text-xs text-foreground leading-relaxed bg-muted/50 rounded px-3 py-2 max-h-40 overflow-y-auto">
+                                {SECTION_INSTRUCTIONS[s.id] || s.roleNote}
+                              </p>
                             </div>
                             <div>
                               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Lead Drafter(s) — click to reassign</p>

@@ -24,6 +24,7 @@ export interface Section {
   status: TaskStatus;
   progress: number; // 0-100
   notes: string;
+  instruction?: string; // Detailed instructions for completing this section
 }
 
 export interface Document {
