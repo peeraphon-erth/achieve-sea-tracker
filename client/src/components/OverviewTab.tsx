@@ -27,6 +27,8 @@ export default function OverviewTab() {
 
   // Org breakdown
   const orgStats = useMemo(() => {
+    if (!sections || sections.length === 0) return [];
+    
     const orgs: OrgId[] = ["kmitl", "erth", "ait", "recyglo", "uplb"];
     return orgs.map((org) => {
       const members = TEAM_MEMBERS.filter((m) => m.org === org);
@@ -48,36 +50,54 @@ export default function OverviewTab() {
   return (
     <div className="space-y-6 fade-up">
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={<FileText className="w-4 h-4" />}
-          label="Overall Progress"
-          value={`${stats.avgProgress}%`}
-          sub={`${stats.complete} of ${stats.total} sections complete`}
-          color="#2E75B6"
-          ring={stats.avgProgress}
-        />
-        <StatCard
-          icon={<Clock className="w-4 h-4" />}
-          label="In Progress"
-          value={stats.inProgress}
-          sub="sections actively being worked"
-          color="#17A589"
-        />
-        <StatCard
-          icon={<AlertTriangle className="w-4 h-4" />}
-          label="Blocked"
-          value={stats.blocked}
-          sub="sections needing attention"
-          color="#C0392B"
-        />
-        <StatCard
-          icon={<CheckCircle2 className="w-4 h-4" />}
-          label="Documents"
-          value={`${stats.docsVerified}/${stats.docsTotal}`}
-          sub={`${stats.docsMissing} missing or action required`}
-          color="#1E8449"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {/* Overall Progress */}
+        <div className="bg-card rounded-lg p-4 border border-border shadow-sm">
+          <div className="flex items-start justify-between mb-2">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Overall Progress</p>
+              <p className="text-2xl font-bold text-primary mt-1">{stats.avgProgress}%</p>
+            </div>
+            <ProgressRing value={stats.avgProgress} size={48} />
+          </div>
+          <p className="text-xs text-muted-foreground">{stats.complete} of {stats.total} sections complete</p>
+        </div>
+
+        {/* In Progress */}
+        <div className="bg-card rounded-lg p-4 border border-border shadow-sm">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">In Progress</p>
+              <p className="text-2xl font-bold text-green-600 mt-1">{stats.inProgress}</p>
+            </div>
+            <Clock className="w-6 h-6 text-green-600 opacity-20" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Sections actively being worked</p>
+        </div>
+
+        {/* Blocked */}
+        <div className="bg-card rounded-lg p-4 border border-border shadow-sm">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Blocked</p>
+              <p className="text-2xl font-bold text-destructive mt-1">{stats.blocked}</p>
+            </div>
+            <AlertTriangle className="w-6 h-6 text-destructive opacity-20" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">Sections needing attention</p>
+        </div>
+
+        {/* Documents */}
+        <div className="bg-card rounded-lg p-4 border border-border shadow-sm">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Documents</p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.docsVerified}/{stats.docsTotal}</p>
+            </div>
+            <FileText className="w-6 h-6 text-blue-600 opacity-20" />
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">{stats.docsMissing} missing or action required</p>
+        </div>
       </div>
 
       {/* Deadline Banner */}
@@ -116,60 +136,42 @@ export default function OverviewTab() {
           Team Workload by Organisation
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-          {orgStats.map(({ org, cfg, members, ownedSections, done }) => (
-            <div
-              key={org}
-              className="bg-card rounded-lg p-4 border border-border shadow-sm hover:shadow-md transition-shadow duration-200"
-              style={{ borderTopWidth: 3, borderTopColor: cfg.color }}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider" style={{ color: cfg.textColor }}>
-                    {org.toUpperCase()}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    {members.filter((m) => m.id !== "kmitl_ro").slice(0, 2).map((m) => m.name).join(", ")}
-                    {members.filter((m) => m.id !== "kmitl_ro").length > 2 && ` +${members.filter((m) => m.id !== "kmitl_ro").length - 2}`}
-                  </p>
+          {Array.isArray(orgStats) && orgStats.length > 0 ? (
+            orgStats.map(({ org, cfg, members, ownedSections, done }) => (
+              <div
+                key={org}
+                className="bg-card rounded-lg p-4 border border-border shadow-sm hover:shadow-md transition-shadow duration-200"
+                style={{ borderTopWidth: 3, borderTopColor: cfg.color }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-wider" style={{ color: cfg.textColor }}>
+                      {org.toUpperCase()}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{cfg.label}</p>
+                  </div>
+                  <ProgressRing value={ownedSections.length > 0 ? Math.round((done / ownedSections.length) * 100) : 0} size={40} />
                 </div>
-                <ProgressRing
-                  value={ownedSections.length ? Math.round((done / ownedSections.length) * 100) : 0}
-                  size={44}
-                  strokeWidth={4}
-                  color={cfg.color}
-                />
+                <div className="mb-3">
+                  <p className="text-2xl font-bold text-foreground">{ownedSections.length}</p>
+                  <p className="text-xs text-muted-foreground">sections assigned</p>
+                </div>
+                <div className="space-y-1">
+                  {members.map((m) => (
+                    <MemberPill key={m.id} memberId={m.id} />
+                  ))}
+                </div>
               </div>
-              <div className="text-2xl font-bold tabular-nums" style={{ color: cfg.color }}>
-                {ownedSections.length}
-              </div>
-              <p className="text-xs text-muted-foreground">sections assigned</p>
-              <ProgressBar
-                value={ownedSections.length ? Math.round((done / ownedSections.length) * 100) : 0}
-                color={cfg.color}
-                className="mt-2"
-              />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8 text-muted-foreground text-sm">
+              Loading organisation data...
             </div>
-          ))}
+          )}
         </div>
       </div>
 
-      {/* Org Legend */}
-      <div className="flex flex-wrap gap-2">
-        {(Object.keys(ORG_CONFIG) as OrgId[]).map((org) => {
-          const cfg = ORG_CONFIG[org];
-          return (
-            <span
-              key={org}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border border-border bg-card"
-            >
-              <span className="w-2 h-2 rounded-full" style={{ background: cfg.color }} />
-              {cfg.label}
-            </span>
-          );
-        })}
-      </div>
-
-      {/* Quick Ownership Matrix */}
+      {/* Section Ownership Matrix */}
       <div>
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
           Section Ownership Matrix
@@ -180,95 +182,58 @@ export default function OverviewTab() {
               <tr className="bg-primary text-primary-foreground">
                 <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-12">#</th>
                 <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider">Section</th>
-                <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider hidden md:table-cell">Lead Drafter(s)</th>
-                <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider hidden lg:table-cell">Role</th>
+                <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider">Lead Drafter(s)</th>
+                <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider">Role</th>
                 <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-24">Due</th>
                 <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-32">Status</th>
               </tr>
             </thead>
             <tbody>
-              {sections.map((s, i) => {
-                const cfg = STATUS_CONFIG[s.status];
-                return (
-                  <tr
-                    key={s.id}
-                    className="border-t border-border hover:bg-muted/40 transition-colors duration-100"
-                  >
+              {Array.isArray(sections) && sections.length > 0 ? (
+                sections.slice(0, 5).map((s) => (
+                  <tr key={s.id} className="border-t border-border hover:bg-muted/40 transition-colors">
                     <td className="px-4 py-2.5">
-                      <span className="font-mono text-xs font-bold text-primary">{s.num}</span>
+                      <span className="text-xs font-mono font-bold text-muted-foreground">{s.num}</span>
                     </td>
                     <td className="px-4 py-2.5">
                       <span className="text-xs font-medium">{s.title}</span>
                     </td>
-                    <td className="px-4 py-2.5 hidden md:table-cell">
+                    <td className="px-4 py-2.5">
                       <div className="flex flex-wrap gap-1">
                         {s.leadIds.map((id) => (
                           <MemberPill key={id} memberId={id} />
                         ))}
                       </div>
                     </td>
-                    <td className="px-4 py-2.5 hidden lg:table-cell">
-                      <span className="text-xs text-muted-foreground italic">{s.roleNote}</span>
+                    <td className="px-4 py-2.5">
+                      <p className="text-xs text-muted-foreground">{s.roleNote}</p>
                     </td>
                     <td className="px-4 py-2.5">
                       <span className="text-xs font-semibold text-destructive">{s.dueDate}</span>
                     </td>
                     <td className="px-4 py-2.5">
                       <span
-                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-                        style={{ background: cfg.bg, color: cfg.color }}
+                        className="inline-block px-2 py-1 rounded-full text-xs font-semibold"
+                        style={{
+                          background: STATUS_CONFIG[s.status]?.bg,
+                          color: STATUS_CONFIG[s.status]?.color,
+                        }}
                       >
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ background: cfg.dot }} />
-                        {cfg.label}
+                        {STATUS_CONFIG[s.status]?.label}
                       </span>
                     </td>
                   </tr>
-                );
-              })}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground text-sm">
+                    Loading sections...
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-
-function StatCard({
-  icon,
-  label,
-  value,
-  sub,
-  color,
-  ring,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string | number;
-  sub: string;
-  color: string;
-  ring?: number;
-}) {
-  return (
-    <div
-      className="bg-card rounded-lg p-4 border border-border shadow-sm hover:shadow-md transition-shadow duration-200"
-      style={{ borderTopWidth: 3, borderTopColor: color }}
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-1.5 mb-1">
-            <span style={{ color }}>{icon}</span>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</p>
-          </div>
-          <p className="text-3xl font-bold tabular-nums" style={{ color }}>
-            {value}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">{sub}</p>
-        </div>
-        {ring !== undefined && (
-          <ProgressRing value={ring} size={52} strokeWidth={5} color={color} />
-        )}
       </div>
     </div>
   );

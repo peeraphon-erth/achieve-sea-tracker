@@ -43,6 +43,48 @@ export function useSupabaseSync(
     subscriptionsRef.current.forEach((unsub) => unsub());
     subscriptionsRef.current = [];
 
+    // Normalize data from Supabase (convert strings to arrays/objects if needed)
+    const normalizeData = (data: any): any => {
+      if (!data) return data;
+      
+      // For sections: ensure leadIds is an array
+      if (Array.isArray(data)) {
+        return data.map((item: any) => {
+          const normalized = { ...item };
+          if (normalized.leadIds && typeof normalized.leadIds === 'string') {
+            try {
+              normalized.leadIds = JSON.parse(normalized.leadIds);
+            } catch {
+              normalized.leadIds = [];
+            }
+          }
+          if (!Array.isArray(normalized.leadIds)) {
+            normalized.leadIds = [];
+          }
+          return normalized;
+        });
+      }
+      return data;
+    };
+
+    // Normalize phase tasks
+    const normalizePhases = (phases: any[]): any[] => {
+      return (phases || []).map((phase: any) => {
+        const normalized = { ...phase };
+        if (normalized.tasks && typeof normalized.tasks === 'string') {
+          try {
+            normalized.tasks = JSON.parse(normalized.tasks);
+          } catch {
+            normalized.tasks = [];
+          }
+        }
+        if (!Array.isArray(normalized.tasks)) {
+          normalized.tasks = [];
+        }
+        return normalized;
+      });
+    };
+
     const fetchAllData = async () => {
       try {
         const [sectionsRes, docsRes, phasesRes] = await Promise.all([
@@ -53,9 +95,9 @@ export function useSupabaseSync(
 
         if (isMounted && sectionsRes.data && docsRes.data && phasesRes.data) {
           onUpdateRef.current({
-            sections: sectionsRes.data as Section[],
-            documents: docsRes.data as Document[],
-            phases: phasesRes.data as Phase[],
+            sections: normalizeData(sectionsRes.data) as Section[],
+            documents: normalizeData(docsRes.data) as Document[],
+            phases: normalizePhases(phasesRes.data) as Phase[],
             lastUpdated: Date.now(),
           });
         }
