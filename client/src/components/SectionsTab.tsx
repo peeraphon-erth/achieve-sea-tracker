@@ -17,11 +17,11 @@ import {
 type FilterKey = "all" | "not_started" | "in_progress" | "review" | "blocked" | "complete" | OrgId;
 
 export default function SectionsTab() {
-  const { sections, updateSectionStatus, updateSectionProgress, updateSectionLeads, updateSectionNotes } = useTracker();
+  const { sections = [], updateSectionStatus, updateSectionProgress, updateSectionLeads, updateSectionNotes } = useTracker();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>("all");
 
-  const filtered = filter === "all" ? sections : sections.filter((s) => {
+  const filtered = filter === "all" ? sections : (sections || []).filter((s) => {
     if (["blocked", "in_progress", "review", "complete", "not_started"].includes(filter)) {
       return s.status === filter;
     }

@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { MemberPill, TeamMemberSelect } from "./TrackerUI";
 
 export default function TimelineTab() {
-  const { phases, togglePhaseTask, reassignPhaseTask } = useTracker();
+  const { phases = [], togglePhaseTask, reassignPhaseTask } = useTracker();
 
   return (
     <div className="space-y-4 fade-up">
@@ -19,9 +19,9 @@ export default function TimelineTab() {
         </p>
       </div>
 
-      {phases.map((phase, phaseIdx) => {
-        const doneTasks = phase.tasks.filter((t) => t.done).length;
-        const totalTasks = phase.tasks.length;
+      {(phases || []).map((phase, phaseIdx) => {
+        const doneTasks = (phase?.tasks || []).filter((t) => t?.done).length;
+        const totalTasks = phase?.tasks?.length || 0;
         const pct = Math.round((doneTasks / totalTasks) * 100);
 
         return (

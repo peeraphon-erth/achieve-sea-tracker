@@ -9,18 +9,18 @@ import { ORG_CONFIG, STATUS_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data"
 import { MemberPill, ProgressBar, ProgressRing } from "./TrackerUI";
 
 export default function OverviewTab() {
-  const { sections, documents } = useTracker();
+  const { sections = [], documents = [] } = useTracker();
 
   const stats = useMemo(() => {
-    const total = sections.length;
-    const complete = sections.filter((s) => s.status === "complete").length;
-    const inProgress = sections.filter((s) => s.status === "in_progress").length;
-    const blocked = sections.filter((s) => s.status === "blocked").length;
-    const avgProgress = Math.round(sections.reduce((a, s) => a + s.progress, 0) / total);
+    const total = sections?.length || 0;
+    const complete = sections?.filter((s) => s.status === "complete").length || 0;
+    const inProgress = sections?.filter((s) => s.status === "in_progress").length || 0;
+    const blocked = sections?.filter((s) => s.status === "blocked").length || 0;
+    const avgProgress = total > 0 ? Math.round((sections?.reduce((a, s) => a + s.progress, 0) || 0) / total) : 0;
 
-    const docsTotal = documents.length;
-    const docsMissing = documents.filter((d) => d.status === "missing").length;
-    const docsVerified = documents.filter((d) => d.status === "verified").length;
+    const docsTotal = documents?.length || 0;
+    const docsMissing = documents?.filter((d) => d.status === "missing").length || 0;
+    const docsVerified = documents?.filter((d) => d.status === "verified").length || 0;
 
     return { total, complete, inProgress, blocked, avgProgress, docsTotal, docsMissing, docsVerified };
   }, [sections, documents]);
@@ -31,8 +31,8 @@ export default function OverviewTab() {
     return orgs.map((org) => {
       const members = TEAM_MEMBERS.filter((m) => m.org === org);
       const memberIds = members.map((m) => m.id);
-      const ownedSections = sections.filter((s) =>
-        s.leadIds.some((id) => memberIds.includes(id))
+      const ownedSections = (sections || []).filter((s) =>
+        s?.leadIds?.some?.((id) => memberIds.includes(id))
       );
       const done = ownedSections.filter((s) => s.status === "complete").length;
       const cfg = ORG_CONFIG[org];

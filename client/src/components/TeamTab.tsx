@@ -10,16 +10,16 @@ import { MemberPill, ProgressBar, ProgressRing, StatusBadge } from "./TrackerUI"
 const ORG_ORDER: OrgId[] = ["kmitl", "erth", "ait", "recyglo", "uplb"];
 
 export default function TeamTab() {
-  const { sections, documents, phases } = useTracker();
+  const { sections = [], documents = [], phases = [] } = useTracker();
 
   const memberStats = useMemo(() => {
     return TEAM_MEMBERS.map((member) => {
-      const ownedSections = sections.filter((s) => s.leadIds.includes(member.id));
-      const ownedDocs = documents.filter((d) => d.responsibleId === member.id);
-      const ownedTasks = phases.flatMap((p) =>
-        p.tasks.filter((t) => t.ownerId === member.id).map((t) => ({ ...t, phaseId: p.id, phaseName: p.name, phaseColor: p.color }))
+      const ownedSections = (sections || []).filter((s) => s?.leadIds?.includes(member.id));
+      const ownedDocs = (documents || []).filter((d) => d?.responsibleId === member.id);
+      const ownedTasks = (phases || []).flatMap((p) =>
+        (p?.tasks || []).filter((t) => t?.ownerId === member.id).map((t) => ({ ...t, phaseId: p.id, phaseName: p.name, phaseColor: p.color }))
       );
-      const completedTasks = ownedTasks.filter((t) => t.done).length;
+      const completedTasks = ownedTasks.filter((t) => t?.done).length;
       const avgProgress = ownedSections.length
         ? Math.round(ownedSections.reduce((a, s) => a + s.progress, 0) / ownedSections.length)
         : 0;

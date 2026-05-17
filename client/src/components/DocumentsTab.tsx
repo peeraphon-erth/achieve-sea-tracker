@@ -31,11 +31,11 @@ const STATUS_ICONS: Record<DocStatus, React.ReactNode> = {
 };
 
 export default function DocumentsTab() {
-  const { documents, updateDocStatus, updateDocStatusNote, updateDocResponsible } = useTracker();
+  const { documents = [], updateDocStatus, updateDocStatusNote, updateDocResponsible } = useTracker();
 
   const summary = useMemo(() => {
     const counts: Record<DocStatus, number> = { missing: 0, unverified: 0, verified: 0, na: 0 };
-    documents.forEach((d) => counts[d.status]++);
+    (documents || []).forEach((d) => counts[d.status]++);
     return counts;
   }, [documents]);
 
