@@ -68,8 +68,19 @@ export function useSupabaseSync(
       return data;
     };
 
-    // Normalize phase tasks
+    // Normalize and sort phases
     const normalizePhases = (phases: any[]): any[] => {
+      const phaseOrder: Record<string, number> = {
+        p1: 1,
+        p2a: 2,
+        p2b: 3,
+        p3: 4,
+        p4: 5,
+        p5: 6,
+        p6: 7,
+        p7: 8,
+      };
+
       return (phases || []).map((phase: any) => {
         const normalized = { ...phase };
         if (normalized.tasks && typeof normalized.tasks === 'string') {
@@ -83,6 +94,11 @@ export function useSupabaseSync(
           normalized.tasks = [];
         }
         return normalized;
+      }).sort((a: any, b: any) => {
+        const orderA = phaseOrder[a.id] ?? Number.MAX_SAFE_INTEGER;
+        const orderB = phaseOrder[b.id] ?? Number.MAX_SAFE_INTEGER;
+        if (orderA !== orderB) return orderA - orderB;
+        return String(a.id).localeCompare(String(b.id));
       });
     };
 

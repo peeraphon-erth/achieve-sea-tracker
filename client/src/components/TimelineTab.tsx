@@ -16,6 +16,24 @@ export default function TimelineTab() {
     reassignPhaseTask,
   } = useTracker();
 
+  const phaseOrder: Record<string, number> = {
+    p1: 1,
+    p2a: 2,
+    p2b: 3,
+    p3: 4,
+    p4: 5,
+    p5: 6,
+    p6: 7,
+    p7: 8,
+  };
+
+  const sortedPhases = [...(phases || [])].sort((a, b) => {
+    const orderA = phaseOrder[a.id] ?? Number.MAX_SAFE_INTEGER;
+    const orderB = phaseOrder[b.id] ?? Number.MAX_SAFE_INTEGER;
+    if (orderA !== orderB) return orderA - orderB;
+    return a.id.localeCompare(b.id);
+  });
+
   return (
     <div className="space-y-4 fade-up">
       <div className="flex items-center gap-2 mb-2">
@@ -24,7 +42,7 @@ export default function TimelineTab() {
         </p>
       </div>
 
-      {(phases || []).map((phase, phaseIdx) => {
+      {sortedPhases.map((phase, phaseIdx) => {
         const doneTasks = (phase?.tasks || []).filter(t => t?.done).length;
         const totalTasks = phase?.tasks?.length || 0;
         const pct = Math.round((doneTasks / totalTasks) * 100);
