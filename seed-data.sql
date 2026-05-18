@@ -6,6 +6,24 @@
 DELETE FROM phases;
 DELETE FROM documents;
 DELETE FROM sections;
+DELETE FROM team_members;
+
+-- ─── Team Members (13 total) ───────────────────────────────────────────────
+
+INSERT INTO team_members (id, name, org, role, initials) VALUES
+('ploy', 'Dr. Ploypailin', 'kmitl', 'PI / Lead', 'PY'),
+('kendo', 'Kendo', 'erth', 'Project Manager', 'KE'),
+('pallavi', 'Pallavi', 'ait', 'Co-PI (AIT)', 'PA'),
+('voravate', 'Voravate', 'ait', 'Co-PI (AIT)', 'VO'),
+('okka', 'Okka', 'recyglo', 'Co-PI (RecyGlo)', 'OK'),
+('janin', 'Janin', 'recyglo', 'Portal Coordinator', 'JA'),
+('ko', 'Ko', 'recyglo', 'RecyGlo Team', 'KO'),
+('aida', 'Aida', 'recyglo', 'RecyGlo Team', 'AI'),
+('rhea', 'Rhea', 'uplb', 'Co-PI (UPLB)', 'RH'),
+('hybunna', 'Hybunna', 'uplb', 'Co-PI (PNC Cambodia)', 'HY'),
+('santhad', 'Santhad', 'uplb', 'Deputy PI', 'SA'),
+('kmitl_ro', 'KMITL RO', 'kmitl', 'Research Office', 'RO'),
+('all', 'All Orgs', 'all', 'Consortium', 'AL');
 
 -- ─── Sections (19 total) ──────────────────────────────────────────────────
 

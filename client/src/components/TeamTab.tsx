@@ -2,7 +2,7 @@
 // Design: Neo-Institutional / Data Command Center
 // Team member cards with assigned sections, workload, and quick reassignment
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, STATUS_CONFIG, type OrgId } from "@/lib/data";
 import { ProgressRing } from "./TrackerUI";
@@ -16,7 +16,20 @@ export default function TeamTab() {
     phases = [],
     teamMembers = [],
     updateTeamMember,
+    addTeamMember,
+    validateMemberRemoval,
+    removeTeamMember,
   } = useTracker();
+  const [newMember, setNewMember] = useState({
+    id: "",
+    name: "",
+    initials: "",
+    role: "",
+    org: "kmitl" as OrgId,
+  });
+  const [removeCandidateId, setRemoveCandidateId] = useState<string | null>(null);
+  const [reassignToId, setReassignToId] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const memberStats = useMemo(() => {
     return teamMembers.map(member => {
@@ -63,8 +76,106 @@ export default function TeamTab() {
     }));
   }, [memberStats]);
 
+  const removeCandidate = teamMembers.find(m => m.id === removeCandidateId) || null;
+  const removalRefs = removeCandidate
+    ? validateMemberRemoval(removeCandidate.id)
+    : { sections: 0, documents: 0, tasks: 0, total: 0 };
+  const replacementOptions = teamMembers.filter(
+    member => member.id !== removeCandidateId
+  );
+
+  const onAddMember = async () => {
+    if (!newMember.id || !newMember.name || !newMember.initials || !newMember.role) {
+      return;
+    }
+    setIsSubmitting(true);
+    const result = await addTeamMember({
+      id: newMember.id.trim().toLowerCase().replace(/\s+/g, "_"),
+      name: newMember.name.trim(),
+      initials: newMember.initials.trim().toUpperCase().slice(0, 4),
+      role: newMember.role.trim(),
+      org: newMember.org,
+    });
+    setIsSubmitting(false);
+    if (!result.ok) return;
+    setNewMember({ id: "", name: "", initials: "", role: "", org: "kmitl" });
+  };
+
+  const onRemoveMember = async () => {
+    if (!removeCandidateId || !reassignToId) return;
+    setIsSubmitting(true);
+    const result = await removeTeamMember(removeCandidateId, reassignToId);
+    setIsSubmitting(false);
+    if (!result.ok) return;
+    setRemoveCandidateId(null);
+    setReassignToId("");
+  };
+
   return (
     <div className="space-y-8 fade-up">
+      <div className="bg-card rounded-lg border border-border p-4 shadow-sm space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Add Team Member
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+          <input
+            value={newMember.id}
+            onChange={e => setNewMember(prev => ({ ...prev, id: e.target.value }))}
+            className="rounded border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            placeholder="id (e.g. jane_doe)"
+          />
+          <input
+            value={newMember.name}
+            onChange={e =>
+              setNewMember(prev => ({ ...prev, name: e.target.value }))
+            }
+            className="rounded border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            placeholder="Full name"
+          />
+          <input
+            value={newMember.initials}
+            onChange={e =>
+              setNewMember(prev => ({
+                ...prev,
+                initials: e.target.value.toUpperCase().slice(0, 4),
+              }))
+            }
+            className="rounded border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            placeholder="Initials"
+          />
+          <input
+            value={newMember.role}
+            onChange={e =>
+              setNewMember(prev => ({ ...prev, role: e.target.value }))
+            }
+            className="rounded border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            placeholder="Role"
+          />
+          <div className="flex gap-2">
+            <select
+              value={newMember.org}
+              onChange={e =>
+                setNewMember(prev => ({ ...prev, org: e.target.value as OrgId }))
+              }
+              className="flex-1 rounded border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring"
+            >
+              {ORG_ORDER.map(orgId => (
+                <option key={orgId} value={orgId}>
+                  {orgId.toUpperCase()}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={onAddMember}
+              disabled={isSubmitting}
+              className="rounded bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-50"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+
       {orgGroups.map(({ org, cfg, members }) => (
         <div key={org}>
           {/* Org Header */}
@@ -131,6 +242,15 @@ export default function TeamTab() {
                         className="w-full bg-transparent text-xs text-muted-foreground truncate focus:outline-none"
                       />
                     </div>
+                    <button
+                      onClick={() => {
+                        setRemoveCandidateId(member.id);
+                        setReassignToId("");
+                      }}
+                      className="text-[10px] font-semibold px-2 py-1 rounded border border-destructive/40 text-destructive hover:bg-destructive/10"
+                    >
+                      Remove
+                    </button>
                     <ProgressRing
                       value={avgProgress}
                       size={40}
@@ -283,6 +403,47 @@ export default function TeamTab() {
           </div>
         </div>
       ))}
+
+      {removeCandidate && (
+        <div className="bg-card rounded-lg border border-destructive/30 p-4 shadow-sm space-y-3">
+          <p className="text-sm font-bold text-destructive">
+            Reassign before removing {removeCandidate.name}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            This member currently owns {removalRefs.sections} section(s), {removalRefs.documents} document(s), and {removalRefs.tasks} timeline task(s). Select a replacement to continue.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center">
+            <select
+              value={reassignToId}
+              onChange={e => setReassignToId(e.target.value)}
+              className="rounded border border-border bg-background px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-ring min-w-[220px]"
+            >
+              <option value="">Select replacement member</option>
+              {replacementOptions.map(member => (
+                <option key={member.id} value={member.id}>
+                  {member.name} ({member.initials})
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={onRemoveMember}
+              disabled={!reassignToId || isSubmitting}
+              className="rounded bg-destructive px-3 py-1.5 text-xs font-semibold text-destructive-foreground disabled:opacity-50"
+            >
+              Reassign and Remove
+            </button>
+            <button
+              onClick={() => {
+                setRemoveCandidateId(null);
+                setReassignToId("");
+              }}
+              className="rounded border border-border px-3 py-1.5 text-xs font-semibold"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

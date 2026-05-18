@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { createClient } from "@supabase/supabase-js";
-import type { Document, Phase, Section } from "@/lib/data";
+import type { Document, Phase, Section, TeamMember } from "@/lib/data";
 
 // Initialize Supabase client
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "";
@@ -19,6 +19,7 @@ export interface SyncState {
   sections: Section[];
   documents: Document[];
   phases: Phase[];
+  teamMembers: TeamMember[];
   lastUpdated: number;
 }
 
@@ -87,17 +88,25 @@ export function useSupabaseSync(
 
     const fetchAllData = async () => {
       try {
-        const [sectionsRes, docsRes, phasesRes] = await Promise.all([
+        const [sectionsRes, docsRes, phasesRes, membersRes] = await Promise.all([
           supabase.from("sections").select("*"),
           supabase.from("documents").select("*"),
           supabase.from("phases").select("*"),
+          supabase.from("team_members").select("*"),
         ]);
 
-        if (isMounted && sectionsRes.data && docsRes.data && phasesRes.data) {
+        if (
+          isMounted &&
+          sectionsRes.data &&
+          docsRes.data &&
+          phasesRes.data &&
+          membersRes.data
+        ) {
           onUpdateRef.current({
             sections: normalizeData(sectionsRes.data) as Section[],
             documents: normalizeData(docsRes.data) as Document[],
             phases: normalizePhases(phasesRes.data) as Phase[],
+            teamMembers: membersRes.data as TeamMember[],
             lastUpdated: Date.now(),
           });
         }
@@ -138,10 +147,20 @@ export function useSupabaseSync(
           )
           .subscribe();
 
+        const teamMembersChannel = supabase
+          .channel("team_members")
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "team_members" },
+            () => fetchAllData()
+          )
+          .subscribe();
+
         subscriptionsRef.current = [
           () => supabase.removeChannel(sectionsChannel),
           () => supabase.removeChannel(docsChannel),
           () => supabase.removeChannel(phasesChannel),
+          () => supabase.removeChannel(teamMembersChannel),
         ];
 
         // Initial fetch - CRITICAL: This loads data from Supabase on mount
@@ -212,6 +231,33 @@ export async function updatePhaseTaskInSupabase(
     .eq("id", phaseId);
 
   if (error) console.error("Update phase task error:", error);
+}
+
+export async function insertTeamMemberInSupabase(member: TeamMember) {
+  if (!supabase) return { error: null };
+  const { error } = await supabase.from("team_members").insert(member);
+  if (error) console.error("Insert team member error:", error);
+  return { error };
+}
+
+export async function updateTeamMemberInSupabase(
+  id: string,
+  updates: Partial<Omit<TeamMember, "id">>
+) {
+  if (!supabase) return { error: null };
+  const { error } = await supabase
+    .from("team_members")
+    .update(updates)
+    .eq("id", id);
+  if (error) console.error("Update team member error:", error);
+  return { error };
+}
+
+export async function deleteTeamMemberInSupabase(id: string) {
+  if (!supabase) return { error: null };
+  const { error } = await supabase.from("team_members").delete().eq("id", id);
+  if (error) console.error("Delete team member error:", error);
+  return { error };
 }
 
 export function isSupabaseConfigured(): boolean {
