@@ -335,11 +335,11 @@ export function TeamMemberSelect({
       <PopoverTrigger asChild>
         <button className="flex flex-wrap gap-1 items-center min-h-[28px] hover:opacity-80 transition-opacity">
           {selectedIds.length === 0 ? (
-            <span className="text-xs text-muted-foreground">Assign…</span>
+            <span key="placeholder" className="text-xs text-muted-foreground">Assign…</span>
           ) : (
             selectedIds.map((id) => <MemberPill key={id} memberId={id} />)
           )}
-          <ChevronDown className="w-3 h-3 text-muted-foreground ml-1" />
+          <ChevronDown key="chevron" className="w-3 h-3 text-muted-foreground ml-1" />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-64 p-2" align="start">
