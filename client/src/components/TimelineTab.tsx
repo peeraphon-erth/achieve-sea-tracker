@@ -74,7 +74,9 @@ export default function TimelineTab() {
             <div className="divide-y divide-border">
               {phase.tasks.map(task => {
                 const member = teamMembers.find(m => m.id === task.ownerId);
-                const orgCfg = member ? ORG_CONFIG[member.org] : ORG_CONFIG.all;
+                const orgCfg = member
+                  ? ORG_CONFIG[member.org]
+                  : { color: "#596367", bg: "#F4F6F7", textColor: "#596367" };
 
                 return (
                   <div

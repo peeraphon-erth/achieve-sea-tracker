@@ -9,7 +9,7 @@ export type TaskStatus =
   | "complete"
   | "blocked";
 export type DocStatus = "missing" | "unverified" | "verified" | "na";
-export type OrgId = "kmitl" | "erth" | "ait" | "recyglo" | "uplb" | "all";
+export type OrgId = "kmitl" | "erth" | "ait" | "recyglo" | "pnc" | "uplb";
 
 export interface TeamMember {
   id: string;
@@ -129,14 +129,14 @@ export const TEAM_MEMBERS: TeamMember[] = [
   {
     id: "hybunna",
     name: "Hybunna",
-    org: "uplb",
+    org: "pnc",
     role: "Co-PI (PNC Cambodia)",
     initials: "HY",
   },
   {
     id: "santhad",
     name: "Santhad",
-    org: "uplb",
+    org: "kmitl",
     role: "Deputy PI",
     initials: "SA",
   },
@@ -147,13 +147,6 @@ export const TEAM_MEMBERS: TeamMember[] = [
     role: "Research Office",
     initials: "RO",
   },
-  {
-    id: "all",
-    name: "All Orgs",
-    org: "all",
-    role: "Consortium",
-    initials: "AL",
-  },
 ];
 
 // ─── Org Config ──────────────────────────────────────────────────────────────
@@ -163,40 +156,40 @@ export const ORG_CONFIG: Record<
   { label: string; color: string; bg: string; textColor: string }
 > = {
   kmitl: {
-    label: "Dr. Ploypailin / KMITL",
+    label: "KMITL",
     color: "#1F3864",
     bg: "#D6E4F0",
     textColor: "#1F3864",
   },
   erth: {
-    label: "ERTH / Kendo",
+    label: "ERTH",
     color: "#17A589",
     bg: "#D1F2EB",
     textColor: "#0E7A67",
   },
   ait: {
-    label: "AIT (Pallavi + Voravate)",
+    label: "AIT",
     color: "#2E75B6",
     bg: "#EBF5FB",
     textColor: "#1A5C94",
   },
   recyglo: {
-    label: "RecyGlo (Okka, Janin, Ko, Aida)",
+    label: "RecyGlo",
     color: "#1E8449",
     bg: "#D5F5E3",
     textColor: "#1E8449",
   },
+  pnc: {
+    label: "PNC",
+    color: "#7D6608",
+    bg: "#FCF3CF",
+    textColor: "#7D6608",
+  },
   uplb: {
-    label: "UPLB / PNC / Santhad",
+    label: "UPLB",
     color: "#CA6F1E",
     bg: "#FDEBD0",
     textColor: "#A05C18",
-  },
-  all: {
-    label: "All Orgs",
-    color: "#596367",
-    bg: "#F4F6F7",
-    textColor: "#596367",
   },
 };
 
@@ -286,8 +279,8 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s2",
     num: "S2",
     title: "Applicant Details (all profiles)",
-    leadIds: ["all"],
-    roleNote: "Each writes own profile; Kendo compiles",
+    leadIds: ["kendo"],
+    roleNote: "Consortium-wide ownership: each organization writes its own profile; project management compiles",
     dueDate: "22 May",
     status: "not_started",
     progress: 0,
@@ -298,7 +291,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S3",
     title: "Consortium Collaborations",
     leadIds: ["janin"],
-    roleNote: "All orgs write 150–200 words; Janin edits + enters portal",
+    roleNote: "All organizations contribute 150-200 words; coordination team edits and enters in portal",
     dueDate: "27 May",
     status: "not_started",
     progress: 0,
@@ -309,7 +302,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S4",
     title: "Research Proposal",
     leadIds: ["pallavi", "ploy"],
-    roleNote: "Ploy: framing; AIT: methodology; ERTH: structure",
+    roleNote: "Lead institution provides framing; AIT provides methodology; ERTH provides structure",
     dueDate: "27 May",
     status: "not_started",
     progress: 0,
@@ -330,8 +323,8 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s6",
     num: "S6",
     title: "Research Involving Animals",
-    leadIds: ["all"],
-    roleNote: "Not applicable — confirm in portal",
+    leadIds: ["kendo"],
+    roleNote: "Consortium-wide ownership — not applicable; project management confirms in portal",
     dueDate: "20 May",
     status: "not_started",
     progress: 0,
@@ -342,7 +335,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S7",
     title: "Research Management & Infrastructure",
     leadIds: ["janin", "ko"],
-    roleNote: "Draft (Janin or Ko suggested)",
+    roleNote: "Draft (coordination team suggested)",
     dueDate: "24 May",
     status: "not_started",
     progress: 0,
@@ -364,7 +357,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S9",
     title: "Research Training & Development",
     leadIds: ["aida"],
-    roleNote: "Draft (Aida suggested)",
+    roleNote: "Draft (training lead suggested)",
     dueDate: "24 May",
     status: "not_started",
     progress: 0,
@@ -375,7 +368,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S10",
     title: "Timetable & Milestones",
     leadIds: ["janin"],
-    roleNote: "All orgs send milestones; Janin builds Gantt; Kendo reviews",
+    roleNote: "All organizations send milestones; coordination team builds Gantt; project management reviews",
     dueDate: "27 May",
     status: "not_started",
     progress: 0,
@@ -386,7 +379,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S11",
     title: "Consortium Budget Overview",
     leadIds: ["kendo"],
-    roleNote: "Each org fills CM sheet; Kendo consolidates",
+    roleNote: "Each organization fills CM sheet; project management consolidates",
     dueDate: "27 May",
     status: "not_started",
     progress: 0,
@@ -409,7 +402,7 @@ export const INITIAL_SECTIONS: Section[] = [
     title: "MEL — Theory of Change & Logframe",
     leadIds: ["pallavi", "janin"],
     roleNote:
-      "AIT: ToC narrative + Logframe; Janin: diagram + compile; Kendo: GEDI",
+      "AIT: ToC narrative + Logframe; coordination team: diagram + compile; project management: GEDI",
     dueDate: "30 May",
     status: "not_started",
     progress: 0,
@@ -420,7 +413,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S14",
     title: "Public & Policy Engagement",
     leadIds: ["okka", "ko"],
-    roleNote: "Draft (Okka or Ko suggested)",
+    roleNote: "Draft (engagement lead suggested)",
     dueDate: "24 May",
     status: "not_started",
     progress: 0,
@@ -432,7 +425,7 @@ export const INITIAL_SECTIONS: Section[] = [
     title: "Project Risk Evaluation",
     leadIds: ["pallavi", "okka", "janin"],
     roleNote:
-      "AIT: data/tech risks; RecyGlo: field risks; Janin: compile; Kendo: financial",
+      "AIT: data/tech risks; RecyGlo: field risks; coordination team: compile; project management: financial",
     dueDate: "30 May",
     status: "not_started",
     progress: 0,
@@ -443,7 +436,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S16",
     title: "Environmental Sustainability",
     leadIds: ["janin"],
-    roleNote: "Draft (Janin suggested)",
+    roleNote: "Draft (coordination lead suggested)",
     dueDate: "24 May",
     status: "not_started",
     progress: 0,
@@ -454,7 +447,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S17",
     title: "Reviewer Suggestions",
     leadIds: ["ploy"],
-    roleNote: "Optional — Dr. Ploy enters directly in portal",
+    roleNote: "Optional — PI enters directly in portal",
     dueDate: "5 Jun",
     status: "not_started",
     progress: 0,
@@ -466,7 +459,7 @@ export const INITIAL_SECTIONS: Section[] = [
     title: "Eligibility & Consortium Org Chart",
     leadIds: ["janin", "kendo"],
     roleNote:
-      "Janin completes in portal; upload org chart; Kendo: S18 eligibility draft",
+      "Coordination team completes in portal and uploads org chart; project management drafts S18 eligibility",
     dueDate: "30 May",
     status: "not_started",
     progress: 0,
@@ -477,7 +470,7 @@ export const INITIAL_SECTIONS: Section[] = [
     num: "S19",
     title: "E-Signature (PI)",
     leadIds: ["ploy"],
-    roleNote: "Dr. Ploy signs after RO approval — final step",
+    roleNote: "PI signs after Research Office approval — final step",
     dueDate: "9 Jun",
     status: "not_started",
     progress: 0,
@@ -502,9 +495,9 @@ export const INITIAL_DOCUMENTS: Document[] = [
   {
     id: "d2",
     docNum: "2",
-    title: "LoS — Deputy PI Santhad (institutional, from UPLB)",
+    title: "LoS — Deputy PI Santhad (institutional, from KMITL)",
     sectionRef: "S2",
-    ownerOrg: "UPLB",
+    ownerOrg: "KMITL",
     responsibleId: "santhad",
     status: "unverified",
     statusNote: "Unverified (image PDF)",
@@ -537,7 +530,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "3c",
     title: "LoS — Co-PI Hybunna (from PNC Cambodia)",
     sectionRef: "S2",
-    ownerOrg: "PNC Cambodia",
+    ownerOrg: "PNC",
     responsibleId: "hybunna",
     status: "missing",
     statusNote: "REWRITE REQUIRED (wrong addressee)",
@@ -548,7 +541,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "3d",
     title: "LoS — Co-PI Rhea (institutional, from UPLB)",
     sectionRef: "S2",
-    ownerOrg: "UPLB Chancellor/Dean",
+    ownerOrg: "UPLB",
     responsibleId: "rhea",
     status: "missing",
     statusNote: "MISSING (personal letter only)",
@@ -581,7 +574,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "6",
     title: "NC3Rs ARRIVE checklist (if applicable)",
     sectionRef: "S6",
-    ownerOrg: "—",
+    ownerOrg: "Consortium-wide",
     responsibleId: "kendo",
     status: "unverified",
     statusNote: "Likely N/A — confirm",
@@ -614,7 +607,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "9",
     title: "Gantt Chart (SEA DREAM template)",
     sectionRef: "S10",
-    ownerOrg: "Janin (from org inputs)",
+    ownerOrg: "Consortium-wide",
     responsibleId: "kendo",
     status: "missing",
     statusNote: "To build",
@@ -625,7 +618,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "10",
     title: "Full Application Budget Template (USD, mandatory)",
     sectionRef: "S11",
-    ownerOrg: "Janin collects; Kendo approves",
+    ownerOrg: "Consortium-wide",
     responsibleId: "janin",
     status: "missing",
     statusNote: "CM sheets due 23 May",
@@ -636,7 +629,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "11",
     title: "Overhead Justification Letter (if applicable)",
     sectionRef: "S11",
-    ownerOrg: "KMITL Research Office",
+    ownerOrg: "KMITL",
     responsibleId: "ploy",
     status: "unverified",
     statusNote: "Confirm with KMITL RO",
@@ -658,7 +651,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "13",
     title: "Theory of Change diagram (13_MEL_TOC.pdf)",
     sectionRef: "S13",
-    ownerOrg: "ERTH (from AIT narrative)",
+    ownerOrg: "ERTH",
     responsibleId: "kendo",
     status: "missing",
     statusNote: "To prepare",
@@ -669,7 +662,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "14",
     title: "Logical Framework (13_MEL_Logframe.pdf)",
     sectionRef: "S13",
-    ownerOrg: "AIT → ERTH uploads",
+    ownerOrg: "AIT",
     responsibleId: "kendo",
     status: "missing",
     statusNote: "To prepare",
@@ -680,7 +673,7 @@ export const INITIAL_DOCUMENTS: Document[] = [
     docNum: "15",
     title: "Risk Register (15_ProjectRisk_RiskRegister.pdf)",
     sectionRef: "S15",
-    ownerOrg: "Janin compiles",
+    ownerOrg: "Consortium-wide",
     responsibleId: "janin",
     status: "missing",
     statusNote: "To prepare",
@@ -725,7 +718,7 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p1t5",
         ownerId: "kendo",
-        text: "Send LoS templates to Hybunna (PNC) and Rhea (UPLB); verify AIT + RecyGlo existing letters",
+        text: "Send LoS templates to partner organizations and verify existing institutional letters",
         done: false,
       },
     ],
@@ -734,7 +727,7 @@ export const INITIAL_PHASES: Phase[] = [
     id: "p2a",
     num: "Phase 2a",
     dates: "20–22 May",
-    name: "Kendo — Pre-departure",
+    name: "Pre-departure Preparation",
     color: "#2E75B6",
     tasks: [
       {
@@ -746,7 +739,7 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p2at2",
         ownerId: "kendo",
-        text: "Prepare handover doc for Janin: shared folder structure, chase list, portal login instructions",
+        text: "Prepare handover package for the portal coordinator: shared folder structure, chase list, and portal login instructions",
         done: false,
       },
       {
@@ -758,13 +751,13 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p2at4",
         ownerId: "ploy",
-        text: "S2 profile + S4 framing → to Janin by 22 May",
+        text: "Submit S2 profile and S4 framing draft to the coordination channel by 22 May",
         done: false,
       },
       {
         id: "p2at5",
-        ownerId: "all",
-        text: "Rhea, Hybunna, Santhad: all LoS + profiles due 22 May — submit to Janin's shared folder",
+        ownerId: "janin",
+        text: "Collect all pending LoS files and profiles by 22 May and place them in the shared coordination folder",
         done: false,
       },
     ],
@@ -773,7 +766,7 @@ export const INITIAL_PHASES: Phase[] = [
     id: "p2b",
     num: "Phase 2b",
     dates: "23–24 May",
-    name: "Janin Coordinates",
+    name: "Coordination Window",
     color: "#7D6608",
     tasks: [
       {
@@ -785,19 +778,19 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p2bt2",
         ownerId: "janin",
-        text: "S7 (Janin/Ko), S9 (Aida), S14 (Okka/Ko), S16 (Janin) — final drafts due to Janin by 24 May",
+        text: "Finalize S7, S9, S14, and S16 drafts and submit them to the coordination channel by 24 May",
         done: false,
       },
       {
         id: "p2bt3",
         ownerId: "pallavi",
-        text: "S3 input, S4 methodology, S5, S8, References — due to Janin by 24 May",
+        text: "Submit S3 inputs, S4 methodology, S5, S8, and references by 24 May",
         done: false,
       },
       {
         id: "p2bt4",
         ownerId: "janin",
-        text: "Chase any missing inputs (budget sheets, profiles, LoS letters) — escalate to Kendo async only if blocked",
+        text: "Follow up on missing inputs (budget sheets, profiles, LoS letters) and escalate blockers through the decision channel",
         done: false,
       },
       {
@@ -812,19 +805,19 @@ export const INITIAL_PHASES: Phase[] = [
     id: "p3",
     num: "Phase 3",
     dates: "25–27 May",
-    name: "Hard Gate — Janin Coordinates",
+    name: "Hard Gate — Submission Readiness",
     color: "#CA6F1E",
     tasks: [
       {
         id: "p3t1",
         ownerId: "janin",
-        text: "Confirm all CM budget sheets received (due 23 May from orgs); flag any missing to Kendo async immediately",
+        text: "Confirm all CM budget sheets are received (due 23 May) and flag any missing items to the decision channel immediately",
         done: false,
       },
       {
         id: "p3t2",
         ownerId: "kendo",
-        text: "Review and approve budget figures by 27 May — Janin collects, Kendo signs off numbers remotely",
+        text: "Review and approve consolidated budget figures by 27 May",
         done: false,
       },
       {
@@ -842,19 +835,19 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p3t5",
         ownerId: "pallavi",
-        text: "S13 ToC narrative + Logframe due 26 May → to Janin. S15 data/tech/IRB risks due 26 May → to Janin.",
+        text: "Submit S13 ToC narrative + logframe and S15 data/tech/IRB risk inputs by 26 May",
         done: false,
       },
       {
         id: "p3t6",
         ownerId: "okka",
-        text: "S15 field/operational risks due 26 May → to Janin",
+        text: "Submit S15 field and operational risk inputs by 26 May",
         done: false,
       },
       {
         id: "p3t7",
         ownerId: "janin",
-        text: "Integrate S4 full draft (Ploy framing + AIT methodology) in portal by 27 May",
+        text: "Integrate the full S4 draft in the portal by 27 May",
         done: false,
       },
     ],
@@ -863,7 +856,7 @@ export const INITIAL_PHASES: Phase[] = [
     id: "p4",
     num: "Phase 4",
     dates: "28–30 May",
-    name: "Integration — Janin Coordinates",
+    name: "Integration and Packaging",
     color: "#17A589",
     tasks: [
       {
@@ -899,7 +892,7 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p4t6",
         ownerId: "ploy",
-        text: "S2 full check: confirm all Co-PI profiles entered correctly; flag any errors to Janin",
+        text: "Run full S2 profile validation and flag any data-entry errors in the coordination channel",
         done: false,
       },
     ],
@@ -914,7 +907,7 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p5t1",
         ownerId: "ploy",
-        text: "Review full integrated draft in portal; provide consolidated comments to Kendo by 3 Jun",
+        text: "Review the full integrated portal draft and provide consolidated comments by 3 Jun",
         done: false,
       },
       {
@@ -959,12 +952,12 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p6t3",
         ownerId: "kmitl_ro",
-        text: "Give formal approval in portal — this unlocks Dr. Ploy's e-signature step",
+        text: "Give formal approval in portal to unlock the PI e-signature step",
         done: false,
       },
       {
         id: "p6t4",
-        ownerId: "all",
+        ownerId: "kendo",
         text: "⚠ Critical path: RO approval is the single biggest delay risk. RO must be in the portal by 19 May.",
         done: false,
       },
@@ -991,7 +984,7 @@ export const INITIAL_PHASES: Phase[] = [
       },
       {
         id: "p7t3",
-        ownerId: "all",
+        ownerId: "kendo",
         text: "🎯 Portal deadline: 10 July 2026 — submit by 9 July to have buffer",
         done: false,
       },

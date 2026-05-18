@@ -46,7 +46,7 @@ export default function OverviewTab() {
   const orgStats = useMemo(() => {
     if (!sections || sections.length === 0) return [];
 
-    const orgs: OrgId[] = ["kmitl", "erth", "ait", "recyglo", "uplb"];
+    const orgs: OrgId[] = ["kmitl", "erth", "recyglo", "ait", "pnc", "uplb"];
     return orgs.map(org => {
       const members = teamMembers.filter(m => m.org === org);
       const memberIds = members.map(m => m.id);

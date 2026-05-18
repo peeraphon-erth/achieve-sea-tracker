@@ -7,7 +7,7 @@ import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, STATUS_CONFIG, type OrgId } from "@/lib/data";
 import { ProgressRing } from "./TrackerUI";
 
-const ORG_ORDER: OrgId[] = ["kmitl", "erth", "ait", "recyglo", "uplb"];
+const ORG_ORDER: OrgId[] = ["kmitl", "erth", "recyglo", "ait", "pnc", "uplb"];
 
 export default function TeamTab() {
   const {

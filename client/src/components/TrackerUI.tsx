@@ -39,7 +39,7 @@ export function OrgPill({ orgId, name }: { orgId: OrgId; name?: string }) {
         className="w-2 h-2 rounded-full flex-shrink-0"
         style={{ background: cfg.color }}
       />
-      {name ?? cfg.label.split(" / ")[0].split(" (")[0]}
+      {name ?? cfg.label}
     </span>
   );
 }

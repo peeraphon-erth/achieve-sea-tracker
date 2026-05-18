@@ -210,7 +210,7 @@ function DashboardInner() {
               Organisations
             </p>
             <div className="space-y-1">
-              {(["kmitl", "erth", "ait", "recyglo", "uplb"] as OrgId[]).map(
+              {(["kmitl", "erth", "recyglo", "ait", "pnc", "uplb"] as OrgId[]).map(
                 org => {
                   const cfg = ORG_CONFIG[org];
                   return (

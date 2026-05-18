@@ -96,7 +96,7 @@ export default function SectionsTab() {
           </button>
         ))}
         <div className="w-px h-4 bg-border mx-1" />
-        {(["kmitl", "erth", "ait", "recyglo", "uplb"] as OrgId[]).map(org => {
+        {(["kmitl", "erth", "recyglo", "ait", "pnc", "uplb"] as OrgId[]).map(org => {
           const cfg = ORG_CONFIG[org];
           return (
             <button
