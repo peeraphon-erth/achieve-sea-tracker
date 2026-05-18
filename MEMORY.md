@@ -1,98 +1,100 @@
-# MEMORY — Resume After MCP Restart
+# MEMORY — Current Session Snapshot
 
-## What was completed
+## Completed this session
 
-Implemented step 4 (add/remove team members with forced reassignment) and most of step 5 wiring in app code.
+- Supabase connection and persistence were fixed locally; user confirmed persistence test passed.
+- `public.team_members` table was created and seeded on Supabase project `iecxnthkbewgzzdjepqv`.
+- Team/org model was refactored to organization entities only.
+- Timeline phases were refactored to relative windows and delivery-flow naming.
+- Timeline ordering bug was fixed with deterministic phase sorting.
 
-### Code changes already done
+## Supabase actions executed
 
-- `client/src/hooks/useSupabaseSync.ts`
-  - `SyncState` now includes `teamMembers`.
-  - Fetch now includes `team_members` table.
-  - Realtime subscription added for `team_members`.
-  - Added helpers:
-    - `insertTeamMemberInSupabase`
-    - `updateTeamMemberInSupabase`
-    - `deleteTeamMemberInSupabase`
+- Created table and index:
+  - `public.team_members`
+  - `team_members_org_idx`
+- Seeded `team_members` rows from `seed-data.sql` and verified query results.
+- Data cleanup/migration applied:
+  - removed pseudo-member `all`
+  - set `hybunna` org to `pnc`
+  - set `santhad` org to `kmitl`
+  - updated `documents.d2` title to KMITL wording
+  - replaced section lead/task references that used `all`
+  - updated phase names, phase dates (`D-*` windows), and task wording to new timeline model
+  - updated section `roleNote` wording to remove personal names
 
-- `client/src/contexts/SupabaseTrackerContext.tsx`
-  - Sync handler now hydrates `teamMembers` from Supabase state.
-  - `updateTeamMember` now persists to Supabase with rollback on error.
-  - Added context APIs:
-    - `addTeamMember(member)`
-    - `validateMemberRemoval(id)`
-    - `removeTeamMember(id, reassignToId)`
-  - Removal flow reassigns all references before deletion:
-    - `sections.leadIds`
-    - `documents.responsibleId`
-    - `phases.tasks[].ownerId`
+## Important advisory still open
 
-- `client/src/components/TeamTab.tsx`
-  - Added "Add Team Member" form (id, name, initials, role, org).
-  - Added per-member "Remove" button.
-  - Added forced reassignment panel before delete.
-  - Confirm action performs reassign + remove.
-
-- `seed-data.sql`
-  - Added `DELETE FROM team_members;`
-  - Added `INSERT INTO team_members (...)` seed data.
-
-### Build status
-
-- `npm run build` passes.
-- Existing warnings (pre-existing): duplicate `scripts` key in `package.json`, missing analytics env vars in `index.html`.
-
-## Why DB changes were blocked
-
-Supabase MCP was configured with `--read-only`, so DDL failed (`CREATE TABLE` blocked).
-
-User updated config to remove `--read-only`; next action is to continue after restart.
-
-## First actions after restart
-
-1. Confirm Supabase MCP is writable by running a small DDL test.
-2. Create `public.team_members` table and index.
-3. Validate table exists.
-4. Run/verify seed insert for `team_members`.
-5. Live test in app: edit org (e.g., Santhad -> KMITL), refresh, ensure persistence.
-6. Live test forced reassignment remove flow.
-7. Optionally check security advisors and report RLS status.
-
-## SQL to run immediately after restart
-
-```sql
-create table if not exists public.team_members (
-  id text primary key,
-  name text not null,
-  org text not null,
-  role text not null,
-  initials text not null,
-  created_at timestamp without time zone default now(),
-  updated_at timestamp without time zone default now()
-);
-
-create index if not exists team_members_org_idx on public.team_members(org);
-```
-
-## Quick verification SQL
-
-```sql
-select id, name, org, role, initials from public.team_members order by id;
-```
-
-## Important outstanding advisory
-
-Supabase advisor previously reported critical RLS disabled on:
+Supabase security advisor reports critical `RLS disabled` on public tables:
 
 - `public.sections`
 - `public.documents`
 - `public.phases`
+- `public.team_members`
 
-Need to surface this again after restart and decide policy setup before enabling RLS.
+RLS was intentionally postponed to next sprint.
 
-## Suggested immediate MCP commands after restart
+## Code changes made
 
-1. `supabase_execute_sql` with table creation SQL above.
-2. `supabase_list_tables` (verbose) to confirm `public.team_members`.
-3. `supabase_execute_sql` to verify rows in `team_members`.
-4. `supabase_get_advisors` (`security`) to re-check advisories.
+- `client/src/hooks/useSupabaseSync.ts`
+  - includes `teamMembers` in sync state
+  - subscribes to `team_members`
+  - deterministic sort for phases by ID order (`p1`, `p2a`, `p2b`, `p3`, `p4`, `p5`, `p6`, `p7`)
+  - helper methods for team member insert/update/delete
+
+- `client/src/contexts/SupabaseTrackerContext.tsx`
+  - hydrates `teamMembers` from Supabase
+  - add/update/remove team member APIs with rollback-safe behavior
+  - forced reassignment flow updates `sections`, `documents`, and `phases` refs before delete
+
+- `client/src/components/TeamTab.tsx`
+  - org list includes `pnc`
+  - add/remove member UI and forced reassignment flow
+
+- `client/src/components/SectionsTab.tsx`
+  - org filter includes `pnc`
+
+- `client/src/components/OverviewTab.tsx`
+  - org list includes `pnc`
+
+- `client/src/pages/Home.tsx`
+  - org legend includes `pnc`
+
+- `client/src/components/TrackerUI.tsx`
+  - org pill now renders pure organization labels
+
+- `client/src/components/TimelineTab.tsx`
+  - defensive local phase sorting before render
+
+- `client/src/lib/data.ts`
+  - `OrgId` changed to: `kmitl | erth | recyglo | ait | pnc | uplb`
+  - removed org pseudo-member `all`
+  - org labels normalized to organization names only
+  - `INITIAL_SECTIONS`/`INITIAL_DOCUMENTS`/`INITIAL_PHASES` content updated for consistency
+  - phase names and dates switched to relative windows:
+    - `p1` `D-35 to D-30` Initiation & Access Readiness
+    - `p2a` `D-29 to D-26` Inputs Collection I
+    - `p2b` `D-25 to D-22` Inputs Collection II & Triage
+    - `p3` `D-21 to D-14` Core Drafting
+    - `p4` `D-13 to D-9` Integration & Consistency
+    - `p5` `D-8 to D-6` Internal QA & Revision
+    - `p6` `D-5 to D-3` Institutional Approval Gate
+    - `p7` `D-2 to D-1` Submission & Confirmation
+
+- `seed-data.sql`
+  - aligned with org/timeline refactor (no `all`, `hybunna=pnc`, `santhad=kmitl`, updated text)
+
+- `seed-supabase.mjs`
+  - aligned with org/timeline refactor (no `all`, updated section/phase wording)
+
+## Build status
+
+- `npm run build` passes after all edits.
+- Known pre-existing warnings remain:
+  - duplicate `scripts` key warning in `package.json`
+  - missing `%VITE_ANALYTICS_ENDPOINT%` and `%VITE_ANALYTICS_WEBSITE_ID%` in `index.html`
+
+## Current known follow-ups
+
+1. Decide final absolute deadline source and map `D-*` phase windows to concrete dates in UI.
+2. Implement RLS policies for public tables in next sprint.

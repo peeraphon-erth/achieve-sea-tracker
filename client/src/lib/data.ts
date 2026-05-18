@@ -687,38 +687,38 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p1",
     num: "Phase 1",
-    dates: "16–19 May",
-    name: "Kickoff",
+    dates: "D-35 to D-30",
+    name: "Initiation & Access Readiness",
     color: "#1F3864",
     tasks: [
       {
         id: "p1t1",
         ownerId: "ploy",
-        text: "Accept shortlist invitation in grants.sea-dream.org portal",
+        text: "Confirm shortlist acceptance and portal workspace availability",
         done: false,
       },
       {
         id: "p1t2",
         ownerId: "ploy",
-        text: "Invite KMITL Research Office (RO) to portal — critical path dependency",
+        text: "Invite and confirm institutional approval reviewers in the portal",
         done: false,
       },
       {
         id: "p1t3",
         ownerId: "kendo",
-        text: "Share task briefs with all team members; send budget Excel template to each org lead",
+        text: "Publish task briefs, templates, and working conventions to all organizations",
         done: false,
       },
       {
         id: "p1t4",
         ownerId: "kendo",
-        text: "Email SEA DREAM re: AIT country classification (Thailand vs. regional)",
+        text: "Resolve any eligibility or classification clarifications with the program team",
         done: false,
       },
       {
         id: "p1t5",
         ownerId: "kendo",
-        text: "Send LoS templates to partner organizations and verify existing institutional letters",
+        text: "Distribute LoS templates and validate currently available institutional letters",
         done: false,
       },
     ],
@@ -726,38 +726,38 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p2a",
     num: "Phase 2a",
-    dates: "20–22 May",
-    name: "Pre-departure Preparation",
+    dates: "D-29 to D-26",
+    name: "Inputs Collection I",
     color: "#2E75B6",
     tasks: [
       {
         id: "p2at1",
         ownerId: "kendo",
-        text: "Complete S1 verification; draft S12 co-funding; begin S18 eligibility — finish all ERTH-only drafting before departure",
+        text: "Complete S1 verification, start S12 co-funding, and start S18 eligibility drafting",
         done: false,
       },
       {
         id: "p2at2",
         ownerId: "kendo",
-        text: "Prepare handover package for the portal coordinator: shared folder structure, chase list, and portal login instructions",
+        text: "Prepare coordination package: folder map, chase list, and portal operation notes",
         done: false,
       },
       {
         id: "p2at3",
         ownerId: "kendo",
-        text: "Send budget CM sheets to all orgs with hard deadline: 23 May (before departure)",
+        text: "Request CM budget sheets from all organizations with a clear return deadline",
         done: false,
       },
       {
         id: "p2at4",
         ownerId: "ploy",
-        text: "Submit S2 profile and S4 framing draft to the coordination channel by 22 May",
+        text: "Submit lead profile inputs and initial proposal framing to the coordination channel",
         done: false,
       },
       {
         id: "p2at5",
         ownerId: "janin",
-        text: "Collect all pending LoS files and profiles by 22 May and place them in the shared coordination folder",
+        text: "Collect pending LoS files and profile inputs and file them in shared coordination storage",
         done: false,
       },
     ],
@@ -765,38 +765,38 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p2b",
     num: "Phase 2b",
-    dates: "23–24 May",
-    name: "Coordination Window",
+    dates: "D-25 to D-22",
+    name: "Inputs Collection II & Triage",
     color: "#7D6608",
     tasks: [
       {
         id: "p2bt1",
         ownerId: "janin",
-        text: "Take over admin coordination — receive all incoming drafts, LoS letters, and budget CM sheets",
+        text: "Centralize intake for drafts, LoS letters, and budget sheets",
         done: false,
       },
       {
         id: "p2bt2",
         ownerId: "janin",
-        text: "Finalize S7, S9, S14, and S16 drafts and submit them to the coordination channel by 24 May",
+        text: "Finalize S7, S9, S14, and S16 drafts and route for integration",
         done: false,
       },
       {
         id: "p2bt3",
         ownerId: "pallavi",
-        text: "Submit S3 inputs, S4 methodology, S5, S8, and references by 24 May",
+        text: "Submit S3 inputs, S4 methodology, S5, S8, and references for review",
         done: false,
       },
       {
         id: "p2bt4",
         ownerId: "janin",
-        text: "Follow up on missing inputs (budget sheets, profiles, LoS letters) and escalate blockers through the decision channel",
+        text: "Follow up on missing inputs and escalate blockers through the decision channel",
         done: false,
       },
       {
         id: "p2bt5",
         ownerId: "kendo",
-        text: "Available for urgent decisions only — WhatsApp/email. Not for drafting.",
+        text: "Provide rapid decisions for blockers and scope questions",
         done: false,
       },
     ],
@@ -804,50 +804,50 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p3",
     num: "Phase 3",
-    dates: "25–27 May",
-    name: "Hard Gate — Submission Readiness",
+    dates: "D-21 to D-14",
+    name: "Core Drafting",
     color: "#CA6F1E",
     tasks: [
       {
         id: "p3t1",
         ownerId: "janin",
-        text: "Confirm all CM budget sheets are received (due 23 May) and flag any missing items to the decision channel immediately",
+        text: "Confirm all budget sheets are received and flag missing items immediately",
         done: false,
       },
       {
         id: "p3t2",
         ownerId: "kendo",
-        text: "Review and approve consolidated budget figures by 27 May",
+        text: "Review and approve consolidated budget figures",
         done: false,
       },
       {
         id: "p3t3",
         ownerId: "janin",
-        text: "Collect all org milestone inputs; build Gantt in Excel template (S10)",
+        text: "Collect milestone inputs and draft Gantt content for S10",
         done: false,
       },
       {
         id: "p3t4",
         ownerId: "janin",
-        text: "Integrate S3 org inputs into coherent narrative; enter in portal",
+        text: "Integrate S3 organizational inputs into a coherent narrative",
         done: false,
       },
       {
         id: "p3t5",
         ownerId: "pallavi",
-        text: "Submit S13 ToC narrative + logframe and S15 data/tech/IRB risk inputs by 26 May",
+        text: "Submit S13 ToC and logframe content plus S15 technical/IRB risk inputs",
         done: false,
       },
       {
         id: "p3t6",
         ownerId: "okka",
-        text: "Submit S15 field and operational risk inputs by 26 May",
+        text: "Submit S15 field and operational risk inputs",
         done: false,
       },
       {
         id: "p3t7",
         ownerId: "janin",
-        text: "Integrate the full S4 draft in the portal by 27 May",
+        text: "Assemble complete S4 draft for integration",
         done: false,
       },
     ],
@@ -855,44 +855,44 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p4",
     num: "Phase 4",
-    dates: "28–30 May",
-    name: "Integration and Packaging",
+    dates: "D-13 to D-9",
+    name: "Integration & Consistency",
     color: "#17A589",
     tasks: [
       {
         id: "p4t1",
         ownerId: "janin",
-        text: "Enter all drafted sections into portal; upload all collected documents",
+        text: "Integrate drafted sections into portal and upload collected documents",
         done: false,
       },
       {
         id: "p4t2",
         ownerId: "janin",
-        text: "S13: compile AIT's ToC narrative + Logframe; commission and produce ToC flow diagram (PowerPoint → PDF)",
+        text: "Finalize S13 package including ToC diagram and logframe artifacts",
         done: false,
       },
       {
         id: "p4t3",
         ownerId: "janin",
-        text: "S15: compile AIT + RecyGlo risk inputs into single register; export as 15_ProjectRisk_RiskRegister.pdf",
+        text: "Compile S15 risk inputs into a single risk register document",
         done: false,
       },
       {
         id: "p4t4",
         ownerId: "janin",
-        text: "S18: complete eligibility info in portal; upload consortium org chart",
+        text: "Complete S18 eligibility details and upload consortium org chart",
         done: false,
       },
       {
         id: "p4t5",
         ownerId: "kendo",
-        text: "Review integrated portal draft end of 30 May; confirm S11 budget narrative is accurate; add financial risks to S15",
+        text: "Run cross-section consistency review and align budget/risk narratives",
         done: false,
       },
       {
         id: "p4t6",
         ownerId: "ploy",
-        text: "Run full S2 profile validation and flag any data-entry errors in the coordination channel",
+        text: "Run full S2 profile validation and flag data-entry errors",
         done: false,
       },
     ],
@@ -900,14 +900,14 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p5",
     num: "Phase 5",
-    dates: "2–4 Jun",
-    name: "Internal Review",
+    dates: "D-8 to D-6",
+    name: "Internal QA & Revision",
     color: "#6C3483",
     tasks: [
       {
         id: "p5t1",
         ownerId: "ploy",
-        text: "Review the full integrated portal draft and provide consolidated comments by 3 Jun",
+        text: "Review integrated portal draft and provide consolidated comments",
         done: false,
       },
       {
@@ -919,7 +919,7 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p5t3",
         ownerId: "kendo",
-        text: "Implement all review comments; confirm S11 budget narrative final; application ready for RO by 5 Jun",
+        text: "Implement review comments and finalize submission package for institutional review",
         done: false,
       },
       {
@@ -933,8 +933,8 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p6",
     num: "Phase 6",
-    dates: "5–7 Jun",
-    name: "RO Gate",
+    dates: "D-5 to D-3",
+    name: "Institutional Approval Gate",
     color: "#C0392B",
     tasks: [
       {
@@ -946,7 +946,7 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p6t2",
         ownerId: "kendo",
-        text: "Address any RO comments immediately (same-day turnaround required)",
+        text: "Address institutional review comments within same-day turnaround",
         done: false,
       },
       {
@@ -958,7 +958,7 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p6t4",
         ownerId: "kendo",
-        text: "⚠ Critical path: RO approval is the single biggest delay risk. RO must be in the portal by 19 May.",
+        text: "Track approval dependency as critical path and escalate unresolved blockers within 24 hours",
         done: false,
       },
     ],
@@ -966,8 +966,8 @@ export const INITIAL_PHASES: Phase[] = [
   {
     id: "p7",
     num: "Phase 7",
-    dates: "8–9 Jun",
-    name: "Submit",
+    dates: "D-2 to D-1",
+    name: "Submission & Confirmation",
     color: "#1E8449",
     tasks: [
       {
@@ -979,13 +979,13 @@ export const INITIAL_PHASES: Phase[] = [
       {
         id: "p7t2",
         ownerId: "kendo",
-        text: "Confirm submission confirmation email received; retain copy of submitted application",
+        text: "Confirm submission evidence and archive the submitted application package",
         done: false,
       },
       {
         id: "p7t3",
         ownerId: "kendo",
-        text: "🎯 Portal deadline: 10 July 2026 — submit by 9 July to have buffer",
+        text: "Submit with at least one-day operational buffer before final deadline",
         done: false,
       },
     ],
