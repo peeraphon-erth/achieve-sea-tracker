@@ -4,12 +4,17 @@
 
 import { CheckSquare2, Square } from "lucide-react";
 import { useTracker } from "@/contexts/SupabaseTrackerContext";
-import { ORG_CONFIG, TEAM_MEMBERS } from "@/lib/data";
+import { ORG_CONFIG } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { MemberPill, TeamMemberSelect } from "./TrackerUI";
 
 export default function TimelineTab() {
-  const { phases = [], togglePhaseTask, reassignPhaseTask } = useTracker();
+  const {
+    phases = [],
+    teamMembers = [],
+    togglePhaseTask,
+    reassignPhaseTask,
+  } = useTracker();
 
   return (
     <div className="space-y-4 fade-up">
@@ -20,7 +25,7 @@ export default function TimelineTab() {
       </div>
 
       {(phases || []).map((phase, phaseIdx) => {
-        const doneTasks = (phase?.tasks || []).filter((t) => t?.done).length;
+        const doneTasks = (phase?.tasks || []).filter(t => t?.done).length;
         const totalTasks = phase?.tasks?.length || 0;
         const pct = Math.round((doneTasks / totalTasks) * 100);
 
@@ -40,7 +45,9 @@ export default function TimelineTab() {
                   <span className="text-xs font-bold uppercase tracking-wider text-white/80">
                     {phase.num}
                   </span>
-                  <span className="text-base font-bold text-white">{phase.dates}</span>
+                  <span className="text-base font-bold text-white">
+                    {phase.dates}
+                  </span>
                   <span className="text-sm text-white/80">{phase.name}</span>
                 </div>
               </div>
@@ -65,8 +72,8 @@ export default function TimelineTab() {
 
             {/* Tasks */}
             <div className="divide-y divide-border">
-              {phase.tasks.map((task) => {
-                const member = TEAM_MEMBERS.find((m) => m.id === task.ownerId);
+              {phase.tasks.map(task => {
+                const member = teamMembers.find(m => m.id === task.ownerId);
                 const orgCfg = member ? ORG_CONFIG[member.org] : ORG_CONFIG.all;
 
                 return (
@@ -83,17 +90,24 @@ export default function TimelineTab() {
                       className="mt-0.5 flex-shrink-0 transition-all duration-150 hover:opacity-70 active:scale-90"
                       style={{ color: task.done ? "#22C55E" : "#9CA3AF" }}
                     >
-                      {task.done
-                        ? <CheckSquare2 className="w-4 h-4" />
-                        : <Square className="w-4 h-4" />
-                      }
+                      {task.done ? (
+                        <CheckSquare2 className="w-4 h-4" />
+                      ) : (
+                        <Square className="w-4 h-4" />
+                      )}
                     </button>
 
                     {/* Assignee */}
                     <div className="flex-shrink-0 mt-0.5">
                       <TeamMemberSelect
                         selectedIds={[task.ownerId]}
-                        onChange={(ids) => reassignPhaseTask(phase.id, task.id, ids[0] ?? task.ownerId)}
+                        onChange={ids =>
+                          reassignPhaseTask(
+                            phase.id,
+                            task.id,
+                            ids[0] ?? task.ownerId
+                          )
+                        }
                         multiple={false}
                       />
                     </div>
@@ -121,9 +135,12 @@ export default function TimelineTab() {
       <div className="bg-destructive/10 border border-destructive/30 rounded-lg px-5 py-4 flex items-center gap-3">
         <div className="w-2 h-2 rounded-full bg-destructive animate-pulse flex-shrink-0" />
         <div>
-          <p className="text-sm font-bold text-destructive">Portal Deadline: 10 June 2026</p>
+          <p className="text-sm font-bold text-destructive">
+            Portal Deadline: 10 July 2026
+          </p>
           <p className="text-xs text-destructive/80 mt-0.5">
-            Target submission by 9 June to maintain a 24-hour buffer. RO approval (Phase 6) is the critical path dependency.
+            Target submission by 9 July to maintain a 24-hour buffer. RO
+            approval (Phase 6) is the critical path dependency.
           </p>
         </div>
       </div>

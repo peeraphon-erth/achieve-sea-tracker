@@ -18,7 +18,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { useTracker } from "@/contexts/SupabaseTrackerContext";
-import { ORG_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data";
+import { ORG_CONFIG, type OrgId } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import DocumentsTab from "@/components/DocumentsTab";
 import OverviewTab from "@/components/OverviewTab";
@@ -28,16 +28,46 @@ import TeamTab from "@/components/TeamTab";
 
 type TabId = "overview" | "sections" | "documents" | "timeline" | "team";
 
-const TABS: { id: TabId; label: string; icon: React.ReactNode; shortLabel: string }[] = [
-  { id: "overview",  label: "Overview",        shortLabel: "Overview",  icon: <LayoutDashboard className="w-4 h-4" /> },
-  { id: "sections",  label: "All 19 Sections", shortLabel: "Sections",  icon: <Rows3 className="w-4 h-4" /> },
-  { id: "documents", label: "15 Documents",    shortLabel: "Docs",      icon: <FileText className="w-4 h-4" /> },
-  { id: "timeline",  label: "Timeline",        shortLabel: "Timeline",  icon: <CalendarDays className="w-4 h-4" /> },
-  { id: "team",      label: "Team",            shortLabel: "Team",      icon: <Users className="w-4 h-4" /> },
+const TABS: {
+  id: TabId;
+  label: string;
+  icon: React.ReactNode;
+  shortLabel: string;
+}[] = [
+  {
+    id: "overview",
+    label: "Overview",
+    shortLabel: "Overview",
+    icon: <LayoutDashboard className="w-4 h-4" />,
+  },
+  {
+    id: "sections",
+    label: "All 19 Sections",
+    shortLabel: "Sections",
+    icon: <Rows3 className="w-4 h-4" />,
+  },
+  {
+    id: "documents",
+    label: "15 Documents",
+    shortLabel: "Docs",
+    icon: <FileText className="w-4 h-4" />,
+  },
+  {
+    id: "timeline",
+    label: "Timeline",
+    shortLabel: "Timeline",
+    icon: <CalendarDays className="w-4 h-4" />,
+  },
+  {
+    id: "team",
+    label: "Team",
+    shortLabel: "Team",
+    icon: <Users className="w-4 h-4" />,
+  },
 ];
 
 function useDeadlineCountdown() {
-  const deadline = new Date("2026-06-10T23:59:59");
+  const deadline = new Date("2026-07-10T23:59:59");
   const now = new Date();
   const diffMs = deadline.getTime() - now.getTime();
   const diffDays = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
@@ -47,17 +77,33 @@ function useDeadlineCountdown() {
 function DashboardInner() {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const { sections, documents, phases, resetAll, isOnline, isSyncing, supabaseConfigured } = useTracker();
+  const {
+    sections,
+    documents,
+    phases,
+    resetAll,
+    isOnline,
+    isSyncing,
+    supabaseConfigured,
+  } = useTracker();
   const daysLeft = useDeadlineCountdown();
 
-  const blockedCount = sections.filter((s) => s.status === "blocked").length;
-  const missingDocs = documents.filter((d) => d.status === "missing").length;
-  const completedTasks = phases.flatMap((p) => p.tasks).filter((t) => t.done).length;
-  const totalTasks = phases.flatMap((p) => p.tasks).length;
-  const overallProgress = Math.round(sections.reduce((a, s) => a + s.progress, 0) / sections.length);
+  const blockedCount = sections.filter(s => s.status === "blocked").length;
+  const missingDocs = documents.filter(d => d.status === "missing").length;
+  const completedTasks = phases
+    .flatMap(p => p.tasks)
+    .filter(t => t.done).length;
+  const totalTasks = phases.flatMap(p => p.tasks).length;
+  const overallProgress = Math.round(
+    sections.reduce((a, s) => a + s.progress, 0) / sections.length
+  );
 
   const handleReset = () => {
-    if (window.confirm("Reset all progress data to defaults? This cannot be undone.")) {
+    if (
+      window.confirm(
+        "Reset all progress data to defaults? This cannot be undone."
+      )
+    ) {
       resetAll();
       toast.success("All data reset to defaults.");
     }
@@ -79,17 +125,20 @@ function DashboardInner() {
               <p className="text-xs font-bold uppercase tracking-widest text-sidebar-primary truncate">
                 ACHIEVE-SEA
               </p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">Grant Tracker</p>
+              <p className="text-xs text-sidebar-foreground/60 truncate">
+                Grant Tracker
+              </p>
             </div>
           )}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
             className="flex-shrink-0 p-1.5 rounded hover:bg-sidebar-accent transition-colors duration-150 text-sidebar-foreground/60 hover:text-sidebar-foreground"
           >
-            {sidebarCollapsed
-              ? <ChevronRight className="w-4 h-4" />
-              : <ChevronLeft className="w-4 h-4" />
-            }
+            {sidebarCollapsed ? (
+              <ChevronRight className="w-4 h-4" />
+            ) : (
+              <ChevronLeft className="w-4 h-4" />
+            )}
           </button>
         </div>
 
@@ -97,8 +146,12 @@ function DashboardInner() {
         {!sidebarCollapsed && (
           <div className="px-3 py-3 border-b border-sidebar-border">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-sidebar-foreground/60">Overall Progress</span>
-              <span className="text-xs font-bold text-sidebar-primary tabular-nums">{overallProgress}%</span>
+              <span className="text-xs text-sidebar-foreground/60">
+                Overall Progress
+              </span>
+              <span className="text-xs font-bold text-sidebar-primary tabular-nums">
+                {overallProgress}%
+              </span>
             </div>
             <div className="w-full h-1.5 bg-sidebar-border rounded-full overflow-hidden">
               <div
@@ -111,7 +164,7 @@ function DashboardInner() {
 
         {/* Nav Items */}
         <nav className="flex-1 py-3 space-y-0.5 px-2 overflow-y-auto">
-          {TABS.map((tab) => {
+          {TABS.map(tab => {
             const isActive = activeTab === tab.id;
             let badge: number | null = null;
             if (tab.id === "sections" && blockedCount > 0) badge = blockedCount;
@@ -153,17 +206,26 @@ function DashboardInner() {
         {/* Org Color Legend */}
         {!sidebarCollapsed && (
           <div className="px-3 py-3 border-t border-sidebar-border">
-            <p className="text-xs font-semibold text-sidebar-foreground/40 uppercase tracking-wider mb-2">Organisations</p>
+            <p className="text-xs font-semibold text-sidebar-foreground/40 uppercase tracking-wider mb-2">
+              Organisations
+            </p>
             <div className="space-y-1">
-              {(["kmitl", "erth", "ait", "recyglo", "uplb"] as OrgId[]).map((org) => {
-                const cfg = ORG_CONFIG[org];
-                return (
-                  <div key={org} className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cfg.color }} />
-                    <span className="text-xs text-sidebar-foreground/60 truncate">{cfg.label.split(" / ")[0].split(" (")[0]}</span>
-                  </div>
-                );
-              })}
+              {(["kmitl", "erth", "ait", "recyglo", "uplb"] as OrgId[]).map(
+                org => {
+                  const cfg = ORG_CONFIG[org];
+                  return (
+                    <div key={org} className="flex items-center gap-2">
+                      <span
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ background: cfg.color }}
+                      />
+                      <span className="text-xs text-sidebar-foreground/60 truncate">
+                        {cfg.label.split(" / ")[0].split(" (")[0]}
+                      </span>
+                    </div>
+                  );
+                }
+              )}
             </div>
           </div>
         )}
@@ -173,7 +235,9 @@ function DashboardInner() {
           {!sidebarCollapsed && (
             <div className="px-2.5 py-2 rounded-md bg-sidebar-accent/30">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-sidebar-foreground/60">Timeline Tasks</span>
+                <span className="text-xs text-sidebar-foreground/60">
+                  Timeline Tasks
+                </span>
                 <span className="text-xs font-bold text-sidebar-primary tabular-nums">
                   {completedTasks}/{totalTasks}
                 </span>
@@ -181,7 +245,9 @@ function DashboardInner() {
               <div className="w-full h-1 bg-sidebar-border rounded-full overflow-hidden">
                 <div
                   className="h-full bg-sidebar-primary rounded-full transition-all duration-500"
-                  style={{ width: `${totalTasks ? (completedTasks / totalTasks) * 100 : 0}%` }}
+                  style={{
+                    width: `${totalTasks ? (completedTasks / totalTasks) * 100 : 0}%`,
+                  }}
                 />
               </div>
             </div>
@@ -202,11 +268,15 @@ function DashboardInner() {
         {/* Sticky Header */}
         <header className="flex-shrink-0 bg-primary text-primary-foreground px-6 py-3 flex items-center justify-between shadow-md z-10 min-h-[64px]">
           <div className="min-w-0 flex-1">
-            <h1 className="text-base font-bold tracking-tight truncate" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
+            <h1
+              className="text-base font-bold tracking-tight truncate"
+              style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}
+            >
               ACHIEVE-SEA — Full Application Tracker
             </h1>
             <p className="text-xs text-primary-foreground/70 mt-0.5 truncate">
-              DREAM 4 Health 2026 &nbsp;·&nbsp; Application ID: IA-0000000489 &nbsp;·&nbsp; USD 6,250,000 / 60 months
+              DREAM 4 Health 2026 &nbsp;·&nbsp; Application ID: IA-0000000489
+              &nbsp;·&nbsp; USD 6,250,000 / 60 months
             </p>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0 ml-4">
@@ -223,15 +293,21 @@ function DashboardInner() {
               </div>
             )}
             {isOnline && !isSyncing && (
-              <div className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs ${
-                supabaseConfigured
-                  ? "text-green-600/60"
-                  : "text-orange-600/60 bg-orange-500/10"
-              }`}>
-                <span className={`w-2 h-2 rounded-full ${
-                  supabaseConfigured ? "bg-green-500" : "bg-orange-500"
-                }`} />
-                <span>{supabaseConfigured ? "Live (Supabase)" : "Local Only"}</span>
+              <div
+                className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs ${
+                  supabaseConfigured
+                    ? "text-green-600/60"
+                    : "text-orange-600/60 bg-orange-500/10"
+                }`}
+              >
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    supabaseConfigured ? "bg-green-500" : "bg-orange-500"
+                  }`}
+                />
+                <span>
+                  {supabaseConfigured ? "Live (Supabase)" : "Local Only"}
+                </span>
               </div>
             )}
             {daysLeft <= 30 && daysLeft > 7 && (
@@ -248,15 +324,17 @@ function DashboardInner() {
             )}
             <div className="flex items-center gap-1.5 bg-destructive text-destructive-foreground px-3 py-1.5 rounded-full shadow-sm">
               <span className="text-xs font-bold">⏱ Portal Deadline:</span>
-              <span className="text-xs font-bold">10 Jun 2026</span>
-              <span className="text-xs opacity-80 hidden sm:inline">({daysLeft} days)</span>
+              <span className="text-xs font-bold">10 Jul 2026</span>
+              <span className="text-xs opacity-80 hidden sm:inline">
+                ({daysLeft} days)
+              </span>
             </div>
           </div>
         </header>
 
         {/* Tab Bar */}
         <div className="flex-shrink-0 bg-card border-b border-border px-4 sm:px-6 flex gap-0 overflow-x-auto">
-          {TABS.map((tab) => (
+          {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -277,11 +355,11 @@ function DashboardInner() {
         {/* Tab Content */}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-[1300px] mx-auto px-4 sm:px-6 py-6">
-            {activeTab === "overview"  && <OverviewTab />}
-            {activeTab === "sections"  && <SectionsTab />}
+            {activeTab === "overview" && <OverviewTab />}
+            {activeTab === "sections" && <SectionsTab />}
             {activeTab === "documents" && <DocumentsTab />}
-            {activeTab === "timeline"  && <TimelineTab />}
-            {activeTab === "team"      && <TeamTab />}
+            {activeTab === "timeline" && <TimelineTab />}
+            {activeTab === "team" && <TeamTab />}
           </div>
         </main>
       </div>

@@ -5,7 +5,7 @@
 import { ChevronDown, ChevronRight, MessageSquare } from "lucide-react";
 import { Fragment, useState, useMemo } from "react";
 import { useTracker } from "@/contexts/SupabaseTrackerContext";
-import { ORG_CONFIG, STATUS_CONFIG, TEAM_MEMBERS, type OrgId } from "@/lib/data";
+import { ORG_CONFIG, STATUS_CONFIG, type OrgId } from "@/lib/data";
 import { SECTION_INSTRUCTIONS } from "@/lib/section-instructions";
 import { cn } from "@/lib/utils";
 import {
@@ -15,36 +15,65 @@ import {
   TeamMemberSelect,
 } from "./TrackerUI";
 
-type FilterKey = "all" | "not_started" | "in_progress" | "review" | "blocked" | "complete" | OrgId;
+type FilterKey =
+  | "all"
+  | "not_started"
+  | "in_progress"
+  | "review"
+  | "blocked"
+  | "complete"
+  | OrgId;
 
 export default function SectionsTab() {
-  const { sections = [], updateSectionStatus, updateSectionProgress, updateSectionLeads, updateSectionNotes } = useTracker();
+  const {
+    sections = [],
+    teamMembers = [],
+    updateSectionStatus,
+    updateSectionProgress,
+    updateSectionLeads,
+    updateSectionNotes,
+  } = useTracker();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>("all");
 
   const filtered = useMemo(() => {
-    let result = filter === "all" ? sections : (sections || []).filter((s) => {
-      if (["blocked", "in_progress", "review", "complete", "not_started"].includes(filter)) {
-        return s.status === filter;
-      }
-      // filter by org
-      const memberIds = TEAM_MEMBERS.filter((m) => m.org === filter as OrgId).map((m) => m.id);
-      return s.leadIds.some((id) => memberIds.includes(id));
-    });
-    
+    let result =
+      filter === "all"
+        ? sections
+        : (sections || []).filter(s => {
+            if (
+              [
+                "blocked",
+                "in_progress",
+                "review",
+                "complete",
+                "not_started",
+              ].includes(filter)
+            ) {
+              return s.status === filter;
+            }
+            // filter by org
+            const memberIds = teamMembers
+              .filter(m => m.org === (filter as OrgId))
+              .map(m => m.id);
+            return s.leadIds.some(id => memberIds.includes(id));
+          });
+
     // Sort by section number (S1, S2, ... S19) to maintain consistent order
     return result.sort((a, b) => {
-      const numA = parseInt(a.num.replace(/\D/g, '')) || 0;
-      const numB = parseInt(b.num.replace(/\D/g, '')) || 0;
+      const numA = parseInt(a.num.replace(/\D/g, "")) || 0;
+      const numB = parseInt(b.num.replace(/\D/g, "")) || 0;
       return numA - numB;
     });
-  }, [sections, filter]);
+  }, [sections, filter, teamMembers]);
 
   return (
     <div className="space-y-4 fade-up">
       {/* Filter Bar */}
       <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">Filter:</span>
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mr-1">
+          Filter:
+        </span>
         {[
           { key: "all" as FilterKey, label: "All" },
           { key: "not_started" as FilterKey, label: "Not Started" },
@@ -67,7 +96,7 @@ export default function SectionsTab() {
           </button>
         ))}
         <div className="w-px h-4 bg-border mx-1" />
-        {(["kmitl", "erth", "ait", "recyglo", "uplb"] as OrgId[]).map((org) => {
+        {(["kmitl", "erth", "ait", "recyglo", "uplb"] as OrgId[]).map(org => {
           const cfg = ORG_CONFIG[org];
           return (
             <button
@@ -75,11 +104,24 @@ export default function SectionsTab() {
               onClick={() => setFilter(org)}
               className={cn(
                 "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all duration-150 border",
-                filter === org ? "border-transparent" : "border-border bg-card text-muted-foreground hover:bg-accent"
+                filter === org
+                  ? "border-transparent"
+                  : "border-border bg-card text-muted-foreground hover:bg-accent"
               )}
-              style={filter === org ? { background: cfg.bg, color: cfg.textColor, borderColor: cfg.color } : undefined}
+              style={
+                filter === org
+                  ? {
+                      background: cfg.bg,
+                      color: cfg.textColor,
+                      borderColor: cfg.color,
+                    }
+                  : undefined
+              }
             >
-              <span className="w-2 h-2 rounded-full" style={{ background: cfg.color }} />
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ background: cfg.color }}
+              />
               {org.toUpperCase()}
             </button>
           );
@@ -98,22 +140,36 @@ export default function SectionsTab() {
           <thead>
             <tr className="bg-primary text-primary-foreground">
               <th className="px-3 py-2.5 w-10"></th>
-              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-12">#</th>
-              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider">Section Title</th>
-              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider hidden md:table-cell w-48">Lead Drafter(s)</th>
-              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-24">Due</th>
-              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-36">Status</th>
-              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-40 hidden lg:table-cell">Progress</th>
+              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-12">
+                #
+              </th>
+              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider">
+                Section Title
+              </th>
+              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider hidden md:table-cell w-48">
+                Lead Drafter(s)
+              </th>
+              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-24">
+                Due
+              </th>
+              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-36">
+                Status
+              </th>
+              <th className="px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wider w-40 hidden lg:table-cell">
+                Progress
+              </th>
             </tr>
           </thead>
           <tbody>
-            {filtered.map((s) => {
+            {filtered.map(s => {
               const isExpanded = expanded === s.id;
               const statusCfg = STATUS_CONFIG[s.status];
 
               // Determine primary org color from first lead
-              const firstLead = TEAM_MEMBERS.find((m) => m.id === s.leadIds[0]);
-              const orgColor = firstLead ? ORG_CONFIG[firstLead.org].color : "#596367";
+              const firstLead = teamMembers.find(m => m.id === s.leadIds[0]);
+              const orgColor = firstLead
+                ? ORG_CONFIG[firstLead.org].color
+                : "#596367";
 
               return (
                 <Fragment key={s.id}>
@@ -125,37 +181,54 @@ export default function SectionsTab() {
                     onClick={() => setExpanded(isExpanded ? null : s.id)}
                   >
                     <td className="px-3 py-2.5 text-center">
-                      {isExpanded
-                        ? <ChevronDown className="w-4 h-4 text-muted-foreground mx-auto" />
-                        : <ChevronRight className="w-4 h-4 text-muted-foreground mx-auto" />
-                      }
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-muted-foreground mx-auto" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-muted-foreground mx-auto" />
+                      )}
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className="font-mono text-xs font-bold" style={{ color: orgColor }}>{s.num}</span>
+                      <span
+                        className="font-mono text-xs font-bold"
+                        style={{ color: orgColor }}
+                      >
+                        {s.num}
+                      </span>
                     </td>
                     <td className="px-4 py-2.5">
                       <span className="text-xs font-medium">{s.title}</span>
                     </td>
-                    <td className="px-4 py-2.5 hidden md:table-cell" onClick={(e) => e.stopPropagation()}>
+                    <td
+                      className="px-4 py-2.5 hidden md:table-cell"
+                      onClick={e => e.stopPropagation()}
+                    >
                       <TeamMemberSelect
                         selectedIds={s.leadIds}
-                        onChange={(ids) => updateSectionLeads(s.id, ids)}
+                        onChange={ids => updateSectionLeads(s.id, ids)}
                       />
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className="text-xs font-semibold text-destructive whitespace-nowrap">{s.dueDate}</span>
+                      <span className="text-xs font-semibold text-destructive whitespace-nowrap">
+                        {s.dueDate}
+                      </span>
                     </td>
-                    <td className="px-4 py-2.5" onClick={(e) => e.stopPropagation()}>
+                    <td
+                      className="px-4 py-2.5"
+                      onClick={e => e.stopPropagation()}
+                    >
                       <StatusBadge
                         status={s.status}
-                        onChange={(st) => updateSectionStatus(s.id, st)}
+                        onChange={st => updateSectionStatus(s.id, st)}
                         compact
                       />
                     </td>
-                    <td className="px-4 py-2.5 hidden lg:table-cell" onClick={(e) => e.stopPropagation()}>
+                    <td
+                      className="px-4 py-2.5 hidden lg:table-cell"
+                      onClick={e => e.stopPropagation()}
+                    >
                       <ProgressEditor
                         value={s.progress}
-                        onChange={(v) => updateSectionProgress(s.id, v)}
+                        onChange={v => updateSectionProgress(s.id, v)}
                         color={orgColor}
                       />
                     </td>
@@ -169,28 +242,38 @@ export default function SectionsTab() {
                           {/* Left: Details */}
                           <div className="space-y-3">
                             <div>
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Section Instructions</p>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                                Section Instructions
+                              </p>
                               <p className="text-xs text-foreground leading-relaxed bg-muted/50 rounded px-3 py-2 max-h-40 overflow-y-auto">
                                 {SECTION_INSTRUCTIONS[s.id] || s.roleNote}
                               </p>
                             </div>
                             <div>
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Lead Drafter(s) — click to reassign</p>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
+                                Lead Drafter(s) — click to reassign
+                              </p>
                               <div className="flex flex-wrap gap-1.5">
-                                {s.leadIds.map((id) => <MemberPill key={id} memberId={id} />)}
+                                {s.leadIds.map(id => (
+                                  <MemberPill key={id} memberId={id} />
+                                ))}
                               </div>
                               <div className="mt-2">
                                 <TeamMemberSelect
                                   selectedIds={s.leadIds}
-                                  onChange={(ids) => updateSectionLeads(s.id, ids)}
+                                  onChange={ids =>
+                                    updateSectionLeads(s.id, ids)
+                                  }
                                 />
                               </div>
                             </div>
                             <div className="md:hidden">
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Progress</p>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                                Progress
+                              </p>
                               <ProgressEditor
                                 value={s.progress}
-                                onChange={(v) => updateSectionProgress(s.id, v)}
+                                onChange={v => updateSectionProgress(s.id, v)}
                                 color={orgColor}
                               />
                             </div>
@@ -199,21 +282,27 @@ export default function SectionsTab() {
                           {/* Right: Notes + Status */}
                           <div className="space-y-3">
                             <div>
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Status</p>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                                Status
+                              </p>
                               <StatusBadge
                                 status={s.status}
-                                onChange={(st) => updateSectionStatus(s.id, st)}
+                                onChange={st => updateSectionStatus(s.id, st)}
                               />
                             </div>
                             <div>
                               <div className="flex items-center gap-1.5 mb-1">
                                 <MessageSquare className="w-3 h-3 text-muted-foreground" />
-                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Notes & Updates</p>
+                                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                  Notes & Updates
+                                </p>
                               </div>
                               <textarea
                                 value={s.notes}
-                                onChange={(e) => updateSectionNotes(s.id, e.target.value)}
-                                onClick={(e) => e.stopPropagation()}
+                                onChange={e =>
+                                  updateSectionNotes(s.id, e.target.value)
+                                }
+                                onClick={e => e.stopPropagation()}
                                 placeholder="Add notes, blockers, or updates…"
                                 className="w-full h-24 text-xs rounded-md border border-border bg-background px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
                               />
@@ -236,7 +325,8 @@ export default function SectionsTab() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Click any row to expand details and edit notes. Click status badges or assignees to update inline. All changes are saved automatically.
+        Click any row to expand details and edit notes. Click status badges or
+        assignees to update inline. All changes are saved automatically.
       </p>
     </div>
   );

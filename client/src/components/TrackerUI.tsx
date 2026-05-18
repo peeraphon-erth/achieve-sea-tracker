@@ -4,11 +4,11 @@
 
 import { Check, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import {
   DOC_STATUS_CONFIG,
   ORG_CONFIG,
   STATUS_CONFIG,
-  TEAM_MEMBERS,
   type DocStatus,
   type OrgId,
   type TaskStatus,
@@ -47,7 +47,8 @@ export function OrgPill({ orgId, name }: { orgId: OrgId; name?: string }) {
 // ─── Member Pill ─────────────────────────────────────────────────────────────
 
 export function MemberPill({ memberId }: { memberId: string }) {
-  const member = TEAM_MEMBERS.find((m) => m.id === memberId);
+  const { teamMembers = [] } = useTracker();
+  const member = teamMembers.find(m => m.id === memberId);
   if (!member) return null;
   const cfg = ORG_CONFIG[member.org];
   return (
@@ -85,7 +86,10 @@ export function StatusBadge({ status, onChange, compact }: StatusBadgeProps) {
         )}
         style={{ background: cfg.bg, color: cfg.color }}
       >
-        <span className="w-1.5 h-1.5 rounded-full" style={{ background: cfg.dot }} />
+        <span
+          className="w-1.5 h-1.5 rounded-full"
+          style={{ background: cfg.dot }}
+        />
         {cfg.label}
       </span>
     );
@@ -101,13 +105,16 @@ export function StatusBadge({ status, onChange, compact }: StatusBadgeProps) {
           )}
           style={{ background: cfg.bg, color: cfg.color }}
         >
-          <span className="w-1.5 h-1.5 rounded-full" style={{ background: cfg.dot }} />
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ background: cfg.dot }}
+          />
           {cfg.label}
           <ChevronDown className="w-3 h-3 opacity-60" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-44">
-        {statuses.map((s) => {
+        {statuses.map(s => {
           const c = STATUS_CONFIG[s];
           return (
             <DropdownMenuItem
@@ -115,7 +122,10 @@ export function StatusBadge({ status, onChange, compact }: StatusBadgeProps) {
               onClick={() => onChange(s)}
               className="flex items-center gap-2"
             >
-              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: c.dot }} />
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ background: c.dot }}
+              />
               <span className="text-xs">{c.label}</span>
               {s === status && <Check className="w-3 h-3 ml-auto" />}
             </DropdownMenuItem>
@@ -143,7 +153,10 @@ export function DocStatusBadge({ status, onChange }: DocStatusBadgeProps) {
         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap"
         style={{ background: cfg.bg, color: cfg.color }}
       >
-        <span className="w-1.5 h-1.5 rounded-full" style={{ background: cfg.dot }} />
+        <span
+          className="w-1.5 h-1.5 rounded-full"
+          style={{ background: cfg.dot }}
+        />
         {cfg.label}
       </span>
     );
@@ -156,13 +169,16 @@ export function DocStatusBadge({ status, onChange }: DocStatusBadgeProps) {
           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-150 hover:opacity-80 active:scale-95"
           style={{ background: cfg.bg, color: cfg.color }}
         >
-          <span className="w-1.5 h-1.5 rounded-full" style={{ background: cfg.dot }} />
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ background: cfg.dot }}
+          />
           {cfg.label}
           <ChevronDown className="w-3 h-3 opacity-60" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-52">
-        {statuses.map((s) => {
+        {statuses.map(s => {
           const c = DOC_STATUS_CONFIG[s];
           return (
             <DropdownMenuItem
@@ -170,7 +186,10 @@ export function DocStatusBadge({ status, onChange }: DocStatusBadgeProps) {
               onClick={() => onChange(s)}
               className="flex items-center gap-2"
             >
-              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: c.dot }} />
+              <span
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ background: c.dot }}
+              />
               <span className="text-xs">{c.label}</span>
               {s === status && <Check className="w-3 h-3 ml-auto" />}
             </DropdownMenuItem>
@@ -222,7 +241,9 @@ export function ProgressRing({
           strokeDasharray={circ}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          style={{ transition: "stroke-dashoffset 0.8s cubic-bezier(0.23,1,0.32,1)" }}
+          style={{
+            transition: "stroke-dashoffset 0.8s cubic-bezier(0.23,1,0.32,1)",
+          }}
         />
       </svg>
       <span
@@ -247,7 +268,12 @@ export function ProgressBar({
   className?: string;
 }) {
   return (
-    <div className={cn("w-full h-1.5 bg-border rounded-full overflow-hidden", className)}>
+    <div
+      className={cn(
+        "w-full h-1.5 bg-border rounded-full overflow-hidden",
+        className
+      )}
+    >
       <div
         className="h-full rounded-full transition-all duration-700 ease-out"
         style={{ width: `${value}%`, background: color }}
@@ -275,18 +301,26 @@ export function ProgressEditor({
       <PopoverTrigger asChild>
         <button className="flex items-center gap-2 w-full group hover:opacity-80 transition-opacity">
           <ProgressBar value={value} color={color} className="flex-1" />
-          <span className="text-xs font-semibold tabular-nums w-8 text-right" style={{ color }}>
+          <span
+            className="text-xs font-semibold tabular-nums w-8 text-right"
+            style={{ color }}
+          >
             {value}%
           </span>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-52 p-3" align="start">
-        <p className="text-xs font-semibold text-muted-foreground mb-2">Set Progress</p>
+        <p className="text-xs font-semibold text-muted-foreground mb-2">
+          Set Progress
+        </p>
         <div className="flex flex-wrap gap-1.5">
-          {steps.map((s) => (
+          {steps.map(s => (
             <button
               key={s}
-              onClick={() => { onChange(s); setOpen(false); }}
+              onClick={() => {
+                onChange(s);
+                setOpen(false);
+              }}
               className={cn(
                 "px-2 py-1 rounded text-xs font-semibold transition-all duration-100",
                 s === value
@@ -316,6 +350,7 @@ export function TeamMemberSelect({
   multiple?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const { teamMembers = [] } = useTracker();
 
   const toggle = (id: string) => {
     if (!multiple) {
@@ -324,7 +359,7 @@ export function TeamMemberSelect({
       return;
     }
     if (selectedIds.includes(id)) {
-      onChange(selectedIds.filter((x) => x !== id));
+      onChange(selectedIds.filter(x => x !== id));
     } else {
       onChange([...selectedIds, id]);
     }
@@ -335,11 +370,16 @@ export function TeamMemberSelect({
       <PopoverTrigger asChild>
         <button className="flex flex-wrap gap-1 items-center min-h-[28px] hover:opacity-80 transition-opacity">
           {selectedIds.length === 0 ? (
-            <span key="placeholder" className="text-xs text-muted-foreground">Assign…</span>
+            <span key="placeholder" className="text-xs text-muted-foreground">
+              Assign…
+            </span>
           ) : (
-            selectedIds.map((id) => <MemberPill key={id} memberId={id} />)
+            selectedIds.map(id => <MemberPill key={id} memberId={id} />)
           )}
-          <ChevronDown key="chevron" className="w-3 h-3 text-muted-foreground ml-1" />
+          <ChevronDown
+            key="chevron"
+            className="w-3 h-3 text-muted-foreground ml-1"
+          />
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-64 p-2" align="start">
@@ -347,7 +387,7 @@ export function TeamMemberSelect({
           {multiple ? "Select assignees" : "Reassign to"}
         </p>
         <div className="max-h-60 overflow-y-auto">
-          {TEAM_MEMBERS.map((m) => {
+          {teamMembers.map(m => {
             const cfg = ORG_CONFIG[m.org];
             const selected = selectedIds.includes(m.id);
             return (
@@ -367,9 +407,13 @@ export function TeamMemberSelect({
                 </span>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold truncate">{m.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{m.role}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {m.role}
+                  </p>
                 </div>
-                {selected && <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />}
+                {selected && (
+                  <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                )}
               </button>
             );
           })}
