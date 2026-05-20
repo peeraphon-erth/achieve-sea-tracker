@@ -49,6 +49,7 @@ export interface PhaseTask {
   ownerId: string;
   text: string;
   done: boolean;
+  dueDate?: string;
 }
 
 export interface Phase {
@@ -268,7 +269,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s1",
     num: "S1",
     title: "Application Summary",
-    leadIds: ["kendo"],
+    leadIds: ["ploy", "santhad", "pallavi", "okka", "rhea", "hybunna"],
     roleNote: "Verify carry-over data",
     dueDate: "20 May",
     status: "not_started",
@@ -290,7 +291,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s3",
     num: "S3",
     title: "Consortium Collaborations",
-    leadIds: ["janin"],
+    leadIds: ["kendo", "janin"],
     roleNote: "All organizations contribute 150-200 words; coordination team edits and enters in portal",
     dueDate: "27 May",
     status: "not_started",
@@ -334,7 +335,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s7",
     num: "S7",
     title: "Research Management & Infrastructure",
-    leadIds: ["janin", "ko"],
+    leadIds: ["ko"],
     roleNote: "Draft (coordination team suggested)",
     dueDate: "24 May",
     status: "not_started",
@@ -367,7 +368,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s10",
     num: "S10",
     title: "Timetable & Milestones",
-    leadIds: ["janin"],
+    leadIds: ["kendo", "janin"],
     roleNote: "All organizations send milestones; coordination team builds Gantt; project management reviews",
     dueDate: "27 May",
     status: "not_started",
@@ -400,7 +401,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s13",
     num: "S13",
     title: "MEL — Theory of Change & Logframe",
-    leadIds: ["pallavi", "janin"],
+    leadIds: ["pallavi", "janin", "kendo"],
     roleNote:
       "AIT: ToC narrative + Logframe; coordination team: diagram + compile; project management: GEDI",
     dueDate: "30 May",
@@ -412,7 +413,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s14",
     num: "S14",
     title: "Public & Policy Engagement",
-    leadIds: ["okka", "ko"],
+    leadIds: ["okka"],
     roleNote: "Draft (engagement lead suggested)",
     dueDate: "24 May",
     status: "not_started",
@@ -423,7 +424,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s15",
     num: "S15",
     title: "Project Risk Evaluation",
-    leadIds: ["pallavi", "okka", "janin"],
+    leadIds: ["pallavi", "ko", "janin"],
     roleNote:
       "AIT: data/tech risks; RecyGlo: field risks; coordination team: compile; project management: financial",
     dueDate: "30 May",
@@ -457,7 +458,7 @@ export const INITIAL_SECTIONS: Section[] = [
     id: "s18",
     num: "S18",
     title: "Eligibility & Consortium Org Chart",
-    leadIds: ["janin", "kendo"],
+    leadIds: ["janin"],
     roleNote:
       "Coordination team completes in portal and uploads org chart; project management drafts S18 eligibility",
     dueDate: "30 May",

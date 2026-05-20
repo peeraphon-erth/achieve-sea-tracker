@@ -98,3 +98,19 @@ RLS was intentionally postponed to next sprint.
 
 1. Decide final absolute deadline source and map `D-*` phase windows to concrete dates in UI.
 2. Implement RLS policies for public tables in next sprint.
+
+## Notes/comments UX fix (completed)
+
+- The notes/status-note typing jitter issue was fixed by switching from per-keystroke realtime persistence to explicit submit.
+- `client/src/components/SectionsTab.tsx`
+  - section notes now use local draft state
+  - added `Save` and `Cancel` actions
+  - added unsaved indicator
+  - keyboard shortcuts: `Cmd/Ctrl+Enter` to save, `Esc` to cancel
+- `client/src/components/DocumentsTab.tsx`
+  - document status notes now use local draft state
+  - added `Save` and `Cancel` actions
+  - added unsaved indicator
+  - keyboard shortcuts: `Cmd/Ctrl+Enter` to save, `Esc` to cancel
+- Behavior now: notes sync to Supabase only on save (not while typing), reducing realtime rehydrate interference.
+- User validated this fix and confirmed it works.

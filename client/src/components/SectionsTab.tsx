@@ -8,8 +8,13 @@ import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG, STATUS_CONFIG, type OrgId } from "@/lib/data";
 import { SECTION_INSTRUCTIONS } from "@/lib/section-instructions";
 import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
 import {
-  MemberPill,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
   ProgressEditor,
   StatusBadge,
   TeamMemberSelect,
@@ -32,9 +37,56 @@ export default function SectionsTab() {
     updateSectionProgress,
     updateSectionLeads,
     updateSectionNotes,
+    updateSectionDueDate,
   } = useTracker();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterKey>("all");
+  const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
+  const [savingSectionId, setSavingSectionId] = useState<string | null>(null);
+
+  const formatDueDateLabel = (date: Date) =>
+    `${date.getDate()} ${date.toLocaleString("en-US", { month: "short" })}`;
+
+  const parseDueDateLabel = (value?: string | null): Date | undefined => {
+    if (!value || typeof value !== "string") return undefined;
+    if (value === "No due date") return undefined;
+    const match = value.trim().match(/^(\d{1,2})\s+([A-Za-z]{3,})$/);
+    if (!match) return undefined;
+    const day = Number(match[1]);
+    const month = new Date(`${match[2]} 1, 2026`).getMonth();
+    if (Number.isNaN(day) || Number.isNaN(month)) return undefined;
+    return new Date(2026, month, day);
+  };
+
+  const getDraftValue = (sectionId: string, currentValue: string) =>
+    Object.prototype.hasOwnProperty.call(draftNotes, sectionId)
+      ? draftNotes[sectionId]
+      : currentValue;
+
+  const isDirty = (sectionId: string, currentValue: string) =>
+    Object.prototype.hasOwnProperty.call(draftNotes, sectionId) &&
+    draftNotes[sectionId] !== currentValue;
+
+  const onSaveNotes = async (sectionId: string, currentValue: string) => {
+    const next = getDraftValue(sectionId, currentValue);
+    if (next === currentValue) return;
+    setSavingSectionId(sectionId);
+    updateSectionNotes(sectionId, next);
+    setDraftNotes(prev => {
+      const copy = { ...prev };
+      delete copy[sectionId];
+      return copy;
+    });
+    setSavingSectionId(null);
+  };
+
+  const onCancelNotes = (sectionId: string) => {
+    setDraftNotes(prev => {
+      const copy = { ...prev };
+      delete copy[sectionId];
+      return copy;
+    });
+  };
 
   const filtered = useMemo(() => {
     let result =
@@ -163,7 +215,10 @@ export default function SectionsTab() {
           <tbody>
             {filtered.map(s => {
               const isExpanded = expanded === s.id;
-              const statusCfg = STATUS_CONFIG[s.status];
+              const currentDue =
+                s.dueDate ??
+                (s as unknown as { duedate?: string }).duedate ??
+                "No due date";
 
               // Determine primary org color from first lead
               const firstLead = teamMembers.find(m => m.id === s.leadIds[0]);
@@ -208,9 +263,9 @@ export default function SectionsTab() {
                       />
                     </td>
                     <td className="px-4 py-2.5">
-                      <span className="text-xs font-semibold text-destructive whitespace-nowrap">
-                        {s.dueDate}
-                      </span>
+                        <span className="text-xs font-semibold text-destructive whitespace-nowrap">
+                          {s.dueDate ?? (s as unknown as { duedate?: string }).duedate ?? "No due date"}
+                        </span>
                     </td>
                     <td
                       className="px-4 py-2.5"
@@ -253,19 +308,12 @@ export default function SectionsTab() {
                               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">
                                 Lead Drafter(s) — click to reassign
                               </p>
-                              <div className="flex flex-wrap gap-1.5">
-                                {s.leadIds.map(id => (
-                                  <MemberPill key={id} memberId={id} />
-                                ))}
-                              </div>
-                              <div className="mt-2">
-                                <TeamMemberSelect
-                                  selectedIds={s.leadIds}
-                                  onChange={ids =>
-                                    updateSectionLeads(s.id, ids)
-                                  }
-                                />
-                              </div>
+                              <TeamMemberSelect
+                                selectedIds={s.leadIds}
+                                onChange={ids =>
+                                  updateSectionLeads(s.id, ids)
+                                }
+                              />
                             </div>
                             <div className="md:hidden">
                               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
@@ -283,6 +331,40 @@ export default function SectionsTab() {
                           <div className="space-y-3">
                             <div>
                               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                                Due Date
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <button
+                                      type="button"
+                                      onClick={e => e.stopPropagation()}
+                                      className="rounded border border-border bg-background px-2.5 py-1.5 text-xs font-semibold"
+                                    >
+                                      {currentDue}
+                                    </button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar
+                                      mode="single"
+                                      selected={parseDueDateLabel(currentDue)}
+                                      onSelect={date => {
+                                        if (!date) return;
+                                        const next = formatDueDateLabel(date);
+                                        const persistedDue =
+                                          s.dueDate ??
+                                          (s as unknown as { duedate?: string }).duedate ??
+                                          "No due date";
+                                        if (next === persistedDue) return;
+                                        updateSectionDueDate(s.id, next);
+                                      }}
+                                    />
+                                  </PopoverContent>
+                                </Popover>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
                                 Status
                               </p>
                               <StatusBadge
@@ -298,14 +380,54 @@ export default function SectionsTab() {
                                 </p>
                               </div>
                               <textarea
-                                value={s.notes}
+                                value={getDraftValue(s.id, s.notes)}
                                 onChange={e =>
-                                  updateSectionNotes(s.id, e.target.value)
+                                  setDraftNotes(prev => ({
+                                    ...prev,
+                                    [s.id]: e.target.value,
+                                  }))
                                 }
                                 onClick={e => e.stopPropagation()}
+                                onKeyDown={e => {
+                                  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                                    e.preventDefault();
+                                    void onSaveNotes(s.id, s.notes);
+                                  }
+                                  if (e.key === "Escape") {
+                                    e.preventDefault();
+                                    onCancelNotes(s.id);
+                                  }
+                                }}
                                 placeholder="Add notes, blockers, or updates…"
                                 className="w-full h-24 text-xs rounded-md border border-border bg-background px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground"
                               />
+                              <div className="mt-2 flex items-center gap-2">
+                                <button
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    void onSaveNotes(s.id, s.notes);
+                                  }}
+                                  disabled={!isDirty(s.id, s.notes) || savingSectionId === s.id}
+                                  className="rounded bg-primary px-2.5 py-1 text-[11px] font-semibold text-primary-foreground disabled:opacity-50"
+                                >
+                                  {savingSectionId === s.id ? "Saving..." : "Save"}
+                                </button>
+                                <button
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    onCancelNotes(s.id);
+                                  }}
+                                  disabled={!isDirty(s.id, s.notes) || savingSectionId === s.id}
+                                  className="rounded border border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground disabled:opacity-50"
+                                >
+                                  Cancel
+                                </button>
+                                {isDirty(s.id, s.notes) && (
+                                  <span className="text-[11px] text-amber-600 font-medium">
+                                    Unsaved changes
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -325,8 +447,8 @@ export default function SectionsTab() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Click any row to expand details and edit notes. Click status badges or
-        assignees to update inline. All changes are saved automatically.
+        Click any row to expand details and edit notes. Status and assignee
+        changes save inline; notes save on submit.
       </p>
     </div>
   );

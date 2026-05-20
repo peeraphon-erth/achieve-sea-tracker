@@ -44,28 +44,39 @@ export function useSupabaseSync(
     subscriptionsRef.current.forEach((unsub) => unsub());
     subscriptionsRef.current = [];
 
-    // Normalize data from Supabase (convert strings to arrays/objects if needed)
-    const normalizeData = (data: any): any => {
-      if (!data) return data;
-      
-      // For sections: ensure leadIds is an array
-      if (Array.isArray(data)) {
-        return data.map((item: any) => {
-          const normalized = { ...item };
-          if (normalized.leadIds && typeof normalized.leadIds === 'string') {
-            try {
-              normalized.leadIds = JSON.parse(normalized.leadIds);
-            } catch {
-              normalized.leadIds = [];
-            }
-          }
-          if (!Array.isArray(normalized.leadIds)) {
+    const normalizeSections = (sections: any[]): any[] => {
+      return (sections || []).map((row: any) => {
+        const normalized = {
+          ...row,
+          leadIds: row.leadIds ?? row.leadids ?? [],
+          dueDate: row.dueDate ?? row.duedate ?? "",
+          roleNote: row.roleNote ?? row.rolenote ?? "",
+        };
+
+        if (typeof normalized.leadIds === "string") {
+          try {
+            normalized.leadIds = JSON.parse(normalized.leadIds);
+          } catch {
             normalized.leadIds = [];
           }
-          return normalized;
-        });
-      }
-      return data;
+        }
+        if (!Array.isArray(normalized.leadIds)) {
+          normalized.leadIds = [];
+        }
+
+        return normalized;
+      });
+    };
+
+    const normalizeDocuments = (documents: any[]): any[] => {
+      return (documents || []).map((row: any) => ({
+        ...row,
+        docNum: row.docNum ?? row.docnum ?? "",
+        sectionRef: row.sectionRef ?? row.sectionref ?? "",
+        responsibleId: row.responsibleId ?? row.responsibleid ?? "",
+        statusNote: row.statusNote ?? row.statusnote ?? "",
+        dueDate: row.dueDate ?? row.duedate ?? "",
+      }));
     };
 
     // Normalize and sort phases
@@ -119,8 +130,8 @@ export function useSupabaseSync(
           membersRes.data
         ) {
           onUpdateRef.current({
-            sections: normalizeData(sectionsRes.data) as Section[],
-            documents: normalizeData(docsRes.data) as Document[],
+            sections: normalizeSections(sectionsRes.data) as Section[],
+            documents: normalizeDocuments(docsRes.data) as Document[],
             phases: normalizePhases(phasesRes.data) as Phase[],
             teamMembers: membersRes.data as TeamMember[],
             lastUpdated: Date.now(),
@@ -223,7 +234,7 @@ export async function updateDocumentInSupabase(
 export async function updatePhaseTaskInSupabase(
   phaseId: string,
   taskId: string,
-  updates: { done?: boolean; ownerId?: string }
+  updates: { done?: boolean; ownerId?: string; dueDate?: string }
 ) {
   if (!supabase) return;
   

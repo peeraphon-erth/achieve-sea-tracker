@@ -28,23 +28,23 @@ INSERT INTO team_members (id, name, org, role, initials) VALUES
 
 INSERT INTO sections (id, num, title, leadIds, roleNote, dueDate, status, progress, notes) VALUES
 ('s1', 'S1', 'Application Summary', ARRAY['kendo'], 'Verify carry-over data', '20 May', 'not_started', 0, ''),
-('s2', 'S2', 'Applicant Details (all profiles)', ARRAY['kendo'], 'Consortium-wide ownership: each organization writes its own profile; project management compiles', '22 May', 'not_started', 0, ''),
-('s3', 'S3', 'Consortium Collaborations', ARRAY['janin'], 'All organizations contribute 150-200 words; coordination team edits and enters in portal', '27 May', 'not_started', 0, ''),
+('s2', 'S2', 'Applicant Details (all profiles)', ARRAY['ploy','santhad','pallavi','okka','rhea','hybunna'], 'Consortium-wide ownership: each organization writes its own profile; project management compiles', '22 May', 'not_started', 0, ''),
+('s3', 'S3', 'Consortium Collaborations', ARRAY['kendo','janin'], 'All organizations contribute 150-200 words; coordination team edits and enters in portal', '27 May', 'not_started', 0, ''),
 ('s4', 'S4', 'Research Proposal', ARRAY['pallavi','ploy'], 'Lead institution provides framing; AIT provides methodology; ERTH provides structure', '27 May', 'not_started', 0, ''),
 ('s5', 'S5', 'Research Involving Human Participants', ARRAY['pallavi'], 'Draft', '24 May', 'not_started', 0, ''),
 ('s6', 'S6', 'Research Involving Animals', ARRAY['kendo'], 'Consortium-wide ownership — not applicable; project management confirms in portal', '20 May', 'not_started', 0, ''),
-('s7', 'S7', 'Research Management & Infrastructure', ARRAY['janin','ko'], 'Draft (coordination team suggested)', '24 May', 'not_started', 0, ''),
+('s7', 'S7', 'Research Management & Infrastructure', ARRAY['ko'], 'Draft (coordination team suggested)', '24 May', 'not_started', 0, ''),
 ('s8', 'S8', 'Research Outputs Management & Sharing', ARRAY['pallavi'], 'Draft', '24 May', 'not_started', 0, ''),
 ('s9', 'S9', 'Research Training & Development', ARRAY['aida'], 'Draft (training lead suggested)', '24 May', 'not_started', 0, ''),
-('s10', 'S10', 'Timetable & Milestones', ARRAY['janin'], 'All organizations send milestones; coordination team builds Gantt; project management reviews', '27 May', 'not_started', 0, ''),
+('s10', 'S10', 'Timetable & Milestones', ARRAY['kendo','janin'], 'All organizations send milestones; coordination team builds Gantt; project management reviews', '27 May', 'not_started', 0, ''),
 ('s11', 'S11', 'Consortium Budget Overview', ARRAY['kendo'], 'Each organization fills CM sheet; project management consolidates', '27 May', 'not_started', 0, ''),
 ('s12', 'S12', 'Co-Funding', ARRAY['kendo'], 'Draft', '27 May', 'not_started', 0, ''),
-('s13', 'S13', 'MEL — Theory of Change & Logframe', ARRAY['pallavi','janin'], 'AIT: ToC narrative + Logframe; coordination team: diagram + compile; project management: GEDI', '30 May', 'not_started', 0, ''),
-('s14', 'S14', 'Public & Policy Engagement', ARRAY['okka','ko'], 'Draft (engagement lead suggested)', '24 May', 'not_started', 0, ''),
-('s15', 'S15', 'Project Risk Evaluation', ARRAY['pallavi','okka','janin'], 'AIT: data/tech risks; RecyGlo: field risks; coordination team: compile; project management: financial', '30 May', 'not_started', 0, ''),
+('s13', 'S13', 'MEL — Theory of Change & Logframe', ARRAY['pallavi','janin','kendo'], 'AIT: ToC narrative + Logframe; coordination team: diagram + compile; project management: GEDI', '30 May', 'not_started', 0, ''),
+('s14', 'S14', 'Public & Policy Engagement', ARRAY['okka'], 'Draft (engagement lead suggested)', '24 May', 'not_started', 0, ''),
+('s15', 'S15', 'Project Risk Evaluation', ARRAY['pallavi','ko','janin'], 'AIT: data/tech risks; RecyGlo: field risks; coordination team: compile; project management: financial', '30 May', 'not_started', 0, ''),
 ('s16', 'S16', 'Environmental Sustainability', ARRAY['janin'], 'Draft (coordination lead suggested)', '24 May', 'not_started', 0, ''),
 ('s17', 'S17', 'Reviewer Suggestions', ARRAY['ploy'], 'Optional — PI enters directly in portal', '5 Jun', 'not_started', 0, ''),
-('s18', 'S18', 'Eligibility & Consortium Org Chart', ARRAY['janin','kendo'], 'Coordination team completes in portal and uploads org chart; project management drafts S18 eligibility', '30 May', 'not_started', 0, ''),
+('s18', 'S18', 'Eligibility & Consortium Org Chart', ARRAY['janin'], 'Coordination team completes in portal and uploads org chart; project management drafts S18 eligibility', '30 May', 'not_started', 0, ''),
 ('s19', 'S19', 'E-Signature (PI)', ARRAY['ploy'], 'PI signs after Research Office approval — final step', '9 Jun', 'not_started', 0, '');
 
 -- ─── Documents (15 total) ────────────────────────────────────────────────

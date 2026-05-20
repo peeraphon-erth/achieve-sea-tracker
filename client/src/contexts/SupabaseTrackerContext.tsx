@@ -46,8 +46,10 @@ interface TrackerContextValue {
   updateSectionProgress: (id: string, progress: number) => void;
   updateSectionLeads: (id: string, leadIds: string[]) => void;
   updateSectionNotes: (id: string, notes: string) => void;
+  updateSectionDueDate: (id: string, dueDate: string) => void;
   updateDocStatus: (id: string, status: DocStatus) => void;
   updateDocStatusNote: (id: string, note: string) => void;
+  updateDocDueDate: (id: string, dueDate: string) => void;
   updateDocResponsible: (id: string, responsibleId: string) => void;
   updateTeamMember: (
     id: string,
@@ -66,6 +68,7 @@ interface TrackerContextValue {
   ) => Promise<{ ok: boolean; error?: string }>;
   togglePhaseTask: (phaseId: string, taskId: string) => void;
   reassignPhaseTask: (phaseId: string, taskId: string, ownerId: string) => void;
+  updatePhaseTaskDueDate: (phaseId: string, taskId: string, dueDate: string) => void;
   resetAll: () => void;
 }
 
@@ -119,6 +122,11 @@ export function SupabaseTrackerProvider({
     updateSectionInSupabase(id, { notes });
   }, []);
 
+  const updateSectionDueDate = useCallback((id: string, dueDate: string) => {
+    setSections(prev => prev.map(s => (s.id === id ? { ...s, dueDate } : s)));
+    updateSectionInSupabase(id, { dueDate });
+  }, []);
+
   const updateDocStatus = useCallback((id: string, status: DocStatus) => {
     setDocuments(prev => prev.map(d => (d.id === id ? { ...d, status } : d)));
     updateDocumentInSupabase(id, { status });
@@ -129,6 +137,11 @@ export function SupabaseTrackerProvider({
       prev.map(d => (d.id === id ? { ...d, statusNote } : d))
     );
     updateDocumentInSupabase(id, { statusNote });
+  }, []);
+
+  const updateDocDueDate = useCallback((id: string, dueDate: string) => {
+    setDocuments(prev => prev.map(d => (d.id === id ? { ...d, dueDate } : d)));
+    updateDocumentInSupabase(id, { dueDate });
   }, []);
 
   const updateDocResponsible = useCallback(
@@ -326,6 +339,25 @@ export function SupabaseTrackerProvider({
     []
   );
 
+  const updatePhaseTaskDueDate = useCallback(
+    (phaseId: string, taskId: string, dueDate: string) => {
+      setPhases(prev =>
+        prev.map(p =>
+          p.id === phaseId
+            ? {
+                ...p,
+                tasks: p.tasks.map(t =>
+                  t.id === taskId ? { ...t, dueDate } : t
+                ),
+              }
+            : p
+        )
+      );
+      updatePhaseTaskInSupabase(phaseId, taskId, { dueDate });
+    },
+    []
+  );
+
   const resetAll = useCallback(() => {
     setSections(INITIAL_SECTIONS);
     setDocuments(INITIAL_DOCUMENTS);
@@ -346,8 +378,10 @@ export function SupabaseTrackerProvider({
     updateSectionProgress,
     updateSectionLeads,
     updateSectionNotes,
+    updateSectionDueDate,
     updateDocStatus,
     updateDocStatusNote,
+    updateDocDueDate,
     updateDocResponsible,
     updateTeamMember,
     addTeamMember,
@@ -355,6 +389,7 @@ export function SupabaseTrackerProvider({
     removeTeamMember,
     togglePhaseTask,
     reassignPhaseTask,
+    updatePhaseTaskDueDate,
     resetAll,
   };
 

@@ -7,6 +7,12 @@ import { useTracker } from "@/contexts/SupabaseTrackerContext";
 import { ORG_CONFIG } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { MemberPill, TeamMemberSelect } from "./TrackerUI";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function TimelineTab() {
   const {
@@ -14,7 +20,22 @@ export default function TimelineTab() {
     teamMembers = [],
     togglePhaseTask,
     reassignPhaseTask,
+    updatePhaseTaskDueDate,
   } = useTracker();
+
+  const formatDueDateLabel = (date: Date) =>
+    `${date.getDate()} ${date.toLocaleString("en-US", { month: "short" })}`;
+
+  const parseDueDateLabel = (value?: string | null): Date | undefined => {
+    if (!value || typeof value !== "string") return undefined;
+    if (value === "No due date") return undefined;
+    const match = value.trim().match(/^(\d{1,2})\s+([A-Za-z]{3,})$/);
+    if (!match) return undefined;
+    const day = Number(match[1]);
+    const month = new Date(`${match[2]} 1, 2026`).getMonth();
+    if (Number.isNaN(day) || Number.isNaN(month)) return undefined;
+    return new Date(2026, month, day);
+  };
 
   const phaseOrder: Record<string, number> = {
     p1: 1,
@@ -91,6 +112,7 @@ export default function TimelineTab() {
             {/* Tasks */}
             <div className="divide-y divide-border">
               {phase.tasks.map(task => {
+                const currentDue = task.dueDate || "No due date";
                 const member = teamMembers.find(m => m.id === task.ownerId);
                 const orgCfg = member
                   ? ORG_CONFIG[member.org]
@@ -133,16 +155,42 @@ export default function TimelineTab() {
                     </div>
 
                     {/* Task text */}
-                    <p
-                      className={cn(
-                        "text-xs leading-relaxed flex-1 pt-0.5",
-                        task.done
-                          ? "line-through text-muted-foreground"
-                          : "text-foreground"
-                      )}
-                    >
-                      {task.text}
-                    </p>
+                    <div className="flex-1 pt-0.5 flex items-center gap-2 min-w-0">
+                      <p
+                        className={cn(
+                          "text-xs leading-relaxed flex-1 min-w-0",
+                          task.done
+                            ? "line-through text-muted-foreground"
+                            : "text-foreground"
+                        )}
+                      >
+                        {task.text}
+                      </p>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <button
+                              type="button"
+                              className="rounded border border-border bg-background px-2 py-0.5 text-[11px] font-semibold text-muted-foreground whitespace-nowrap"
+                            >
+                              {currentDue}
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={parseDueDateLabel(currentDue)}
+                              onSelect={date => {
+                                if (!date) return;
+                                const next = formatDueDateLabel(date);
+                                if (next === currentDue) return;
+                                updatePhaseTaskDueDate(phase.id, task.id, next);
+                              }}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
                   </div>
                 );
               })}
