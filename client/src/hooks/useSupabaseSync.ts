@@ -15,6 +15,16 @@ if (supabaseUrl && supabaseKey) {
   supabase = createClient(supabaseUrl, supabaseKey);
 }
 
+function remapKeys(
+  updates: Record<string, any>,
+  mapping: Record<string, string>
+): Record<string, any> {
+  return Object.entries(updates).reduce<Record<string, any>>((acc, [key, value]) => {
+    acc[mapping[key] ?? key] = value;
+    return acc;
+  }, {});
+}
+
 export interface SyncState {
   sections: Section[];
   documents: Document[];
@@ -212,9 +222,14 @@ export async function updateSectionInSupabase(
   updates: Record<string, any>
 ) {
   if (!supabase) return;
+  const sectionUpdates = remapKeys(updates, {
+    leadIds: "leadids",
+    dueDate: "duedate",
+    roleNote: "rolenote",
+  });
   const { error } = await supabase
     .from("sections")
-    .update(updates)
+    .update(sectionUpdates)
     .eq("id", id);
   if (error) console.error("Update section error:", error);
 }
@@ -224,9 +239,16 @@ export async function updateDocumentInSupabase(
   updates: Record<string, any>
 ) {
   if (!supabase) return;
+  const documentUpdates = remapKeys(updates, {
+    docNum: "docnum",
+    sectionRef: "sectionref",
+    responsibleId: "responsibleid",
+    statusNote: "statusnote",
+    dueDate: "duedate",
+  });
   const { error } = await supabase
     .from("documents")
-    .update(updates)
+    .update(documentUpdates)
     .eq("id", id);
   if (error) console.error("Update document error:", error);
 }
